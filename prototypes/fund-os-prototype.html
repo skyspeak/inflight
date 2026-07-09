@@ -1,0 +1,476 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Fund OS — Signal Desk</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#0f1512;        /* deep pine-charcoal ground */
+  --panel:#161e1a;
+  --panel-2:#1c2620;
+  --line:#26332c;
+  --text:#e8ece9;
+  --text-dim:#8fa198;
+  --text-faint:#5c6b63;
+  --signal:#e8a33d;     /* warm amber — the signal color */
+  --signal-dim:#8a6526;
+  --up:#7fbf9e;         /* sage for positive */
+  --down:#d47b6a;       /* clay for negative/decay */
+  --cold:#5f8ba8;       /* slate blue for passive/system */
+  --radius:10px;
+  --mono:'IBM Plex Mono',ui-monospace,monospace;
+  --disp:'Space Grotesk',sans-serif;
+  --body:'Inter',system-ui,sans-serif;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{background:var(--ink);color:var(--text);font-family:var(--body);font-size:14px;line-height:1.5;-webkit-font-smoothing:antialiased}
+button{font-family:inherit;cursor:pointer}
+a{color:inherit}
+
+/* ---------- shell ---------- */
+.shell{display:flex;min-height:100vh}
+.nav{width:200px;flex-shrink:0;border-right:1px solid var(--line);padding:22px 14px;display:flex;flex-direction:column;gap:2px;position:sticky;top:0;height:100vh}
+.brand{font-family:var(--disp);font-weight:700;font-size:16px;letter-spacing:.02em;padding:0 10px 18px;display:flex;align-items:center;gap:9px}
+.brand .dot{width:9px;height:9px;border-radius:50%;background:var(--signal);box-shadow:0 0 10px var(--signal);animation:pulse 3s ease-in-out infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.45}}
+@media (prefers-reduced-motion:reduce){.brand .dot{animation:none}}
+.nav button{display:flex;align-items:center;gap:10px;width:100%;text-align:left;background:none;border:none;color:var(--text-dim);padding:9px 10px;border-radius:8px;font-size:13.5px;font-weight:500;transition:background .15s,color .15s}
+.nav button:hover{background:var(--panel);color:var(--text)}
+.nav button.active{background:var(--panel-2);color:var(--signal)}
+.nav button:focus-visible{outline:2px solid var(--signal);outline-offset:1px}
+.nav .key{margin-left:auto;font-family:var(--mono);font-size:10px;color:var(--text-faint);border:1px solid var(--line);border-radius:4px;padding:0 5px}
+.nav-foot{margin-top:auto;padding:10px;font-family:var(--mono);font-size:10.5px;color:var(--text-faint);line-height:1.7}
+.nav-foot b{color:var(--text-dim);font-weight:500}
+
+.main{flex:1;padding:26px 34px 60px;max-width:1180px}
+.screen{display:none}
+.screen.active{display:block;animation:fade .25s ease}
+@keyframes fade{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
+@media (prefers-reduced-motion:reduce){.screen.active{animation:none}}
+
+.eyebrow{font-family:var(--mono);font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--signal);margin-bottom:6px}
+h1{font-family:var(--disp);font-size:26px;font-weight:600;letter-spacing:-.01em;margin-bottom:4px}
+.sub{color:var(--text-dim);font-size:13.5px;margin-bottom:24px;max-width:640px}
+
+/* ---------- signal arc (signature element) ---------- */
+.sig{display:inline-flex;align-items:flex-end;gap:2px;height:14px}
+.sig i{width:3px;border-radius:1px;background:var(--line)}
+.sig i:nth-child(1){height:5px}.sig i:nth-child(2){height:8px}.sig i:nth-child(3){height:11px}.sig i:nth-child(4){height:14px}
+.sig.s1 i:nth-child(-n+1),.sig.s2 i:nth-child(-n+2),.sig.s3 i:nth-child(-n+3),.sig.s4 i:nth-child(-n+4){background:var(--signal)}
+
+/* ---------- shared bits ---------- */
+.card{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius)}
+.badge{font-family:var(--mono);font-size:10px;letter-spacing:.05em;padding:2px 7px;border-radius:5px;border:1px solid var(--line);color:var(--text-dim);white-space:nowrap}
+.badge.amber{color:var(--signal);border-color:var(--signal-dim)}
+.badge.sage{color:var(--up);border-color:#3c5c4c}
+.badge.blue{color:var(--cold);border-color:#37536a}
+.badge.clay{color:var(--down);border-color:#6a4038}
+.num{font-family:var(--mono)}
+.grid{display:grid;gap:14px}
+.btn{background:var(--panel-2);border:1px solid var(--line);color:var(--text);border-radius:8px;padding:7px 14px;font-size:12.5px;font-weight:500;transition:border-color .15s}
+.btn:hover{border-color:var(--signal-dim)}
+.btn.primary{background:var(--signal);border-color:var(--signal);color:#1a1408;font-weight:600}
+.btn.primary:hover{filter:brightness(1.08)}
+.btn:focus-visible{outline:2px solid var(--signal);outline-offset:2px}
+
+/* ---------- radar ---------- */
+.radar-toolbar{display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap}
+.chip{background:none;border:1px solid var(--line);color:var(--text-dim);border-radius:20px;padding:5px 13px;font-size:12px}
+.chip.active{border-color:var(--signal);color:var(--signal)}
+.radar-row{display:grid;grid-template-columns:44px 1fr 210px 120px 90px;gap:16px;align-items:center;padding:15px 18px;border-bottom:1px solid var(--line)}
+.radar-row:last-child{border-bottom:none}
+.radar-row:hover{background:var(--panel-2)}
+.rank{font-family:var(--mono);font-size:17px;color:var(--text-faint);font-weight:500}
+.rname{font-weight:600;font-size:14.5px}
+.rwhy{color:var(--text-dim);font-size:12.5px;margin-top:3px;line-height:1.45}
+.rwhy em{color:var(--signal);font-style:normal}
+.rsources{display:flex;gap:5px;flex-wrap:wrap}
+.rscore{text-align:right}
+.rscore .v{font-family:var(--mono);font-size:19px;font-weight:600;color:var(--signal)}
+.rscore .d{font-family:var(--mono);font-size:10.5px}
+.d.up{color:var(--up)}.d.down{color:var(--down)}
+
+/* ---------- graph / profile ---------- */
+.profile{display:grid;grid-template-columns:340px 1fr;gap:14px;align-items:start}
+.avatar{width:52px;height:52px;border-radius:50%;background:linear-gradient(135deg,var(--signal-dim),var(--panel-2));display:flex;align-items:center;justify-content:center;font-family:var(--disp);font-weight:600;font-size:18px;color:var(--signal)}
+.p-head{display:flex;gap:14px;align-items:center;padding:18px;border-bottom:1px solid var(--line)}
+.p-sec{padding:16px 18px;border-bottom:1px solid var(--line)}
+.p-sec:last-child{border-bottom:none}
+.p-sec h3{font-family:var(--mono);font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--text-faint);margin-bottom:10px}
+.kv{display:flex;justify-content:space-between;font-size:12.5px;padding:3.5px 0}
+.kv span:first-child{color:var(--text-dim)}
+.kv .num{color:var(--text)}
+.merge{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--text-dim);padding:4px 0}
+.merge .src{font-family:var(--mono);font-size:10px;color:var(--cold);width:70px;flex-shrink:0}
+.tl-item{display:grid;grid-template-columns:86px 14px 1fr;gap:12px;padding:11px 0;border-bottom:1px solid var(--line)}
+.tl-item:last-child{border-bottom:none}
+.tl-date{font-family:var(--mono);font-size:11px;color:var(--text-faint);padding-top:2px}
+.tl-node{width:9px;height:9px;border-radius:50%;background:var(--line);margin-top:5px}
+.tl-node.hot{background:var(--signal);box-shadow:0 0 8px rgba(232,163,61,.5)}
+.tl-body{font-size:13px}
+.tl-body .meta{color:var(--text-dim);font-size:11.5px;margin-top:2px}
+.warmth-bar{height:6px;border-radius:3px;background:var(--line);overflow:hidden;margin-top:8px}
+.warmth-bar i{display:block;height:100%;width:78%;background:linear-gradient(90deg,var(--signal-dim),var(--signal));border-radius:3px}
+
+/* ---------- rfs ---------- */
+.rfs-cols{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+.rfs-col h3{font-family:var(--mono);font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--text-faint);margin-bottom:10px;display:flex;align-items:center;gap:8px}
+.rfs-col h3 .count{color:var(--signal)}
+.rfs-card{padding:15px 16px;margin-bottom:12px}
+.rfs-card h4{font-family:var(--disp);font-size:14.5px;font-weight:600;margin-bottom:5px;line-height:1.3}
+.rfs-card p{font-size:12px;color:var(--text-dim);line-height:1.5;margin-bottom:11px}
+.rfs-stats{display:flex;gap:14px;font-family:var(--mono);font-size:10.5px;color:var(--text-faint);border-top:1px solid var(--line);padding-top:9px}
+.rfs-stats b{display:block;font-size:14px;font-weight:600;color:var(--text)}
+.rfs-stats .warn b{color:var(--down)}
+.kill{font-family:var(--mono);font-size:10px;color:var(--down);margin-top:9px}
+
+/* ---------- intros ---------- */
+.intro-card{display:grid;grid-template-columns:1fr auto;gap:16px;padding:17px 18px;margin-bottom:12px;align-items:center}
+.pair{display:flex;align-items:center;gap:10px;font-weight:600;font-size:14px;flex-wrap:wrap}
+.pair .link{color:var(--signal);font-family:var(--mono);font-size:12px}
+.reason{font-size:12.5px;color:var(--text-dim);margin-top:6px;line-height:1.5}
+.reason em{color:var(--text);font-style:normal}
+.intro-actions{display:flex;gap:8px}
+.accepted{border-color:#3c5c4c!important}
+.accepted .intro-actions{display:none}
+.accepted-tag{display:none;font-family:var(--mono);font-size:11px;color:var(--up)}
+.accepted .accepted-tag{display:block}
+
+/* ---------- dashboard ---------- */
+.kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:14px}
+.kpi{padding:16px 18px}
+.kpi .label{font-family:var(--mono);font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--text-faint);margin-bottom:8px}
+.kpi .value{font-family:var(--disp);font-size:27px;font-weight:600;letter-spacing:-.01em}
+.kpi .delta{font-family:var(--mono);font-size:11px;margin-top:3px}
+.loops{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+.loop{padding:17px 18px}
+.loop h3{font-family:var(--disp);font-size:14.5px;font-weight:600;margin-bottom:2px}
+.loop .lsub{font-size:11.5px;color:var(--text-faint);margin-bottom:13px}
+.bar-row{display:grid;grid-template-columns:1fr 44px;gap:10px;align-items:center;margin-bottom:9px;font-size:12px;color:var(--text-dim)}
+.bar-row .track{height:5px;background:var(--line);border-radius:3px;margin-top:4px;overflow:hidden}
+.bar-row .track i{display:block;height:100%;border-radius:3px;background:var(--signal)}
+.bar-row.sage .track i{background:var(--up)}
+.bar-row.blue .track i{background:var(--cold)}
+.bar-row .num{text-align:right;color:var(--text);font-size:12px}
+.feed{margin-top:14px}
+.feed-item{display:grid;grid-template-columns:64px 1fr;gap:14px;padding:9px 18px;border-bottom:1px solid var(--line);font-size:12.5px}
+.feed-item:last-child{border-bottom:none}
+.feed-item .t{font-family:var(--mono);font-size:10.5px;color:var(--text-faint);padding-top:2px}
+.feed-item .src{color:var(--cold);font-family:var(--mono);font-size:10.5px}
+
+@media (max-width:960px){
+  .shell{flex-direction:column}
+  .nav{width:100%;height:auto;position:static;flex-direction:row;overflow-x:auto;border-right:none;border-bottom:1px solid var(--line);padding:12px}
+  .brand{padding:0 10px 0 4px}
+  .nav .key,.nav-foot{display:none}
+  .main{padding:20px 16px 50px}
+  .profile,.rfs-cols,.loops{grid-template-columns:1fr}
+  .kpis{grid-template-columns:repeat(2,1fr)}
+  .radar-row{grid-template-columns:32px 1fr 96px;gap:10px}
+  .rsources{display:none}
+  .sig{display:none}
+}
+</style>
+</head>
+<body>
+<div class="shell">
+  <nav class="nav" aria-label="Fund OS sections">
+    <div class="brand"><span class="dot" aria-hidden="true"></span>Fund OS</div>
+    <button class="active" data-screen="radar">Sourcing Radar <span class="key">1</span></button>
+    <button data-screen="graph">Ecosystem Graph <span class="key">2</span></button>
+    <button data-screen="rfs">RFS Console <span class="key">3</span></button>
+    <button data-screen="intros">Intro Engine <span class="key">4</span></button>
+    <button data-screen="dash">Flywheel <span class="key">5</span></button>
+    <div class="nav-foot">
+      <b>Pipes live</b><br>
+      luma · gcal · gmail-meta<br>zoom · slack · expenses<br>
+      <span style="color:var(--up)">● all syncing</span> · 4m ago
+    </div>
+  </nav>
+
+  <main class="main">
+
+  <!-- ═══════════ RADAR ═══════════ -->
+  <section class="screen active" id="radar">
+    <div class="eyebrow">Weekly partner review · Mon 9:00</div>
+    <h1>Sourcing Radar</h1>
+    <p class="sub">People surfacing before they raise. Ranked by composite signal across event behavior, network motion, and attention exhaust — every score explains itself.</p>
+    <div class="radar-toolbar" role="group" aria-label="Radar filters">
+      <button class="chip active">All signals</button>
+      <button class="chip">Talent flow</button>
+      <button class="chip">Event behavior</button>
+      <button class="chip">Attention</button>
+      <button class="chip">RFS-matched</button>
+    </div>
+    <div class="card">
+      <div class="radar-row">
+        <div class="rank">01</div>
+        <div>
+          <div class="rname">Priya Raghavan <span class="badge amber">stealth</span></div>
+          <div class="rwhy">Left Stripe (Staff Eng, ledgering) 3 wks ago · attended <em>3 of last 4 events</em> · new Delaware C-corp matched to her email domain · GP reply latency to her: <em>41 min</em> (p10)</div>
+        </div>
+        <div class="rsources"><span class="badge blue">luma</span><span class="badge blue">gmail</span><span class="badge blue">incorp</span><span class="badge blue">latency</span></div>
+        <div class="rscore"><div class="v">94</div><div class="d up">▲ 12 this wk</div></div>
+        <div class="sig s4" aria-label="signal strength 4 of 4"><i></i><i></i><i></i><i></i></div>
+      </div>
+      <div class="radar-row">
+        <div class="rank">02</div>
+        <div>
+          <div class="rname">Marcus Oyelaran</div>
+          <div class="rwhy">Asked 2 unanswerable intro requests re: <em>clinical-ops staffing APIs</em> — whitespace flag · co-attended dinner with 2 design partners · GitHub activity spike on private org</div>
+        </div>
+        <div class="rsources"><span class="badge blue">intro-req</span><span class="badge blue">luma</span><span class="badge blue">github</span></div>
+        <div class="rscore"><div class="v">88</div><div class="d up">▲ 7</div></div>
+        <div class="sig s4" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
+      </div>
+      <div class="radar-row">
+        <div class="rank">03</div>
+        <div>
+          <div class="rname">Dana Kimura + Ale Fontán <span class="badge sage">RFS-02 match</span></div>
+          <div class="rwhy">Pair detected: both exited Hyland records-mgmt org within 30 days, <em>co-attended AI × Compliance salon</em>, 4 email threads with each other post-event (72-hr rule)</div>
+        </div>
+        <div class="rsources"><span class="badge blue">talent</span><span class="badge blue">luma</span><span class="badge blue">co-email</span></div>
+        <div class="rscore"><div class="v">83</div><div class="d up">▲ 19</div></div>
+        <div class="sig s3" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
+      </div>
+      <div class="radar-row">
+        <div class="rank">04</div>
+        <div>
+          <div class="rname">Sofia Andersen</div>
+          <div class="rwhy">GP expensed 2 dinners with her in 3 wks · calendar shows 3rd meeting booked <em>same-day</em> · no deck in inbox yet — pre-pitch window open</div>
+        </div>
+        <div class="rsources"><span class="badge blue">expense</span><span class="badge blue">gcal</span></div>
+        <div class="rscore"><div class="v">79</div><div class="d up">▲ 4</div></div>
+        <div class="sig s3" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
+      </div>
+      <div class="radar-row">
+        <div class="rank">05</div>
+        <div>
+          <div class="rname">Rahul Mehta <span class="badge clay">decaying</span></div>
+          <div class="rwhy">Was #2 four weeks ago · no event attendance since · reply latency up 6× · likely raising elsewhere — <em>confirm or archive</em></div>
+        </div>
+        <div class="rsources"><span class="badge blue">latency</span><span class="badge blue">luma</span></div>
+        <div class="rscore"><div class="v">61</div><div class="d down">▼ 18</div></div>
+        <div class="sig s2" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════ GRAPH ═══════════ -->
+  <section class="screen" id="graph">
+    <div class="eyebrow">Ecosystem graph · person</div>
+    <h1>Priya Raghavan</h1>
+    <p class="sub">One identity, stitched from six sources. Nobody typed any of this.</p>
+    <div class="profile">
+      <div class="card">
+        <div class="p-head">
+          <div class="avatar">PR</div>
+          <div>
+            <div style="font-weight:600">Priya Raghavan</div>
+            <div style="font-size:12px;color:var(--text-dim)">ex-Stripe · Staff Eng, Ledgering</div>
+          </div>
+          <div class="sig s4" style="margin-left:auto" aria-label="signal 4 of 4"><i></i><i></i><i></i><i></i></div>
+        </div>
+        <div class="p-sec">
+          <h3>Relationship warmth</h3>
+          <div class="kv"><span>Composite</span><span class="num" style="color:var(--signal)">78 / 100</span></div>
+          <div class="warmth-bar"><i></i></div>
+          <div class="kv" style="margin-top:8px"><span>First touch</span><span class="num">Nov 2025 · demo night</span></div>
+          <div class="kv"><span>Interactions (90d)</span><span class="num">14</span></div>
+          <div class="kv"><span>GP reply latency</span><span class="num" style="color:var(--up)">41 min · p10</span></div>
+          <div class="kv"><span>Strongest edge</span><span class="num">J. Park (GP) · 9 touches</span></div>
+        </div>
+        <div class="p-sec">
+          <h3>Identity resolution · 6 sources</h3>
+          <div class="merge"><span class="src">luma</span>priya.r@gmail.com · 7 events</div>
+          <div class="merge"><span class="src">gmail</span>priya@stripe.com → priya@<span style="color:var(--signal)">meridianpay.io</span></div>
+          <div class="merge"><span class="src">zoom</span>Priya R · 4 sessions, avg 52 min</div>
+          <div class="merge"><span class="src">slack</span>@priyar · #fintech, 23 msgs</div>
+          <div class="merge"><span class="src">incorp</span>Meridian Pay Inc · DE · 18 days old</div>
+          <div class="merge"><span class="src">enrich</span>GitHub: ledger-core commits ↑</div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="p-sec">
+          <h3>Interaction timeline · auto-captured</h3>
+          <div class="tl-item"><div class="tl-date">Jun 30</div><div class="tl-node hot"></div><div class="tl-body">New domain in email headers: <b>meridianpay.io</b><div class="meta">gmail-meta · triggered incorporation cross-check → radar +12</div></div></div>
+          <div class="tl-item"><div class="tl-date">Jun 24</div><div class="tl-node hot"></div><div class="tl-body">Attended <b>Fintech Infra Dinner</b> · sat table 3 with 2 design partners<div class="meta">luma check-in + seating chart · followed by 3 emails within 72 hrs → inferred meetings</div></div></div>
+          <div class="tl-item"><div class="tl-date">Jun 12</div><div class="tl-node"></div><div class="tl-body">45-min Zoom with J. Park · notetaker summary: exploring ACH ledgering wedge<div class="meta">zoom + granola · entities extracted: ACH, ledger-as-a-service, mid-market</div></div></div>
+          <div class="tl-item"><div class="tl-date">Jun 03</div><div class="tl-node"></div><div class="tl-body">Departed Stripe (LinkedIn change detected)<div class="meta">enrichment sweep · talent-flow cluster: 3rd ledgering exit this quarter</div></div></div>
+          <div class="tl-item"><div class="tl-date">May 20</div><div class="tl-node"></div><div class="tl-body">Asked in #fintech: "anyone solved reconciliation for marketplace payouts?"<div class="meta">slack listener · matched to RFS-01 keyword set</div></div></div>
+        </div>
+        <div class="p-sec" style="display:flex;gap:8px;flex-wrap:wrap">
+          <button class="btn primary">Flag for Monday review</button>
+          <button class="btn">Suggest intro</button>
+          <button class="btn">Open in Affinity</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════ RFS ═══════════ -->
+  <section class="screen" id="rfs">
+    <div class="eyebrow">Thesis portfolio · demand-side</div>
+    <h1>Request for Startups</h1>
+    <p class="sub">Every thesis is generated from graph signal, validated at events, and killed by the same data that created it. Each card is a funnel.</p>
+    <div class="rfs-cols">
+      <div class="rfs-col">
+        <h3><span class="count">2</span> Conviction · published</h3>
+        <div class="card rfs-card">
+          <h4>RFS-01 · Ledger infrastructure for marketplace payouts</h4>
+          <p>Signal origin: 11 unanswerable intro requests + talent exodus from Stripe/Adyen ledgering orgs. 4 design partners pre-committed.</p>
+          <div class="rfs-stats">
+            <div><b>17</b>qualified convos</div>
+            <div><b>4</b>design partners</div>
+            <div><b>1</b>term sheet</div>
+          </div>
+          <div class="kill">kill if: &lt;5 qualified convos by Sep 1 — currently safe</div>
+        </div>
+        <div class="card rfs-card">
+          <h4>RFS-02 · AI-native records &amp; retention for regulated mid-market</h4>
+          <p>Signal origin: incumbent-displacement thesis × 2 founder pairs detected exiting legacy ECM vendors. Salon series running.</p>
+          <div class="rfs-stats">
+            <div><b>9</b>qualified convos</div>
+            <div><b>3</b>design partners</div>
+            <div><b>0</b>term sheets</div>
+          </div>
+          <div class="kill">kill if: no team by Oct 15</div>
+        </div>
+      </div>
+      <div class="rfs-col">
+        <h3><span class="count">3</span> Exploratory · one salon each</h3>
+        <div class="card rfs-card">
+          <h4>RFS-03 · Home-health nurse capacity tooling</h4>
+          <p>Signal: recurring operator pain in 2 healthcare dinners; no credible team surfaced yet. Memo drafted, unpublished.</p>
+          <div class="rfs-stats"><div><b>4</b>convos</div><div><b>2</b>partners</div><div><b>—</b>sheets</div></div>
+        </div>
+        <div class="card rfs-card">
+          <h4>RFS-04 · Compliance copilots for fund back-office</h4>
+          <p>Signal: our own ops exhaust + 3 LP asks. Eating our own cooking — internal pilot doubles as diligence.</p>
+          <div class="rfs-stats"><div><b>6</b>convos</div><div><b>1</b>partner</div><div><b>—</b>sheets</div></div>
+        </div>
+        <div class="card rfs-card">
+          <h4>RFS-05 · Event-data infrastructure for community businesses</h4>
+          <p>Signal: 5 inbound asks about our own stack. Category-adjacent; conflicts check pending.</p>
+          <div class="rfs-stats"><div><b>3</b>convos</div><div><b>0</b>partners</div><div><b>—</b>sheets</div></div>
+        </div>
+      </div>
+      <div class="rfs-col">
+        <h3><span class="count">2</span> Watchlist + retired</h3>
+        <div class="card rfs-card" style="opacity:.85">
+          <h4>W-11 · Agentic procurement for construction</h4>
+          <p>Graph signal below threshold (2 mentions / 90d). Promotes at 6.</p>
+          <div class="rfs-stats"><div><b>2</b>mentions</div><div class="warn"><b>low</b>signal</div></div>
+        </div>
+        <div class="card rfs-card" style="opacity:.6">
+          <h4>✕ RFS-K · Creator-economy fintech <span class="badge clay">retired Jun 12</span></h4>
+          <p>Killed on pre-registered criteria: 8 convos, zero design-partner demand. Retirement memo published — credibility is the product.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════ INTROS ═══════════ -->
+  <section class="screen" id="intros">
+    <div class="eyebrow">Value loop · this week's batch</div>
+    <h1>Intro Engine</h1>
+    <p class="sub">Matches proposed from co-attendance, whitespace requests, and design-partner needs. Partner approves; the system drafts and tracks.</p>
+    <div class="card intro-card" id="intro1">
+      <div>
+        <div class="pair">Priya Raghavan <span class="link">⟶</span> Tom Esposito <span class="badge blue">design partner · RFS-01</span></div>
+        <div class="reason">Tom's marketplace (<em>$40M GMV</em>) reconciles payouts manually — exact pain Priya described on Jun 12 Zoom. Both attended Fintech Infra Dinner; never connected directly. <em>Predicted acceptance: high.</em></div>
+      </div>
+      <div class="intro-actions"><button class="btn primary" onclick="acceptIntro('intro1')">Approve intro</button><button class="btn">Skip</button></div>
+      <div class="accepted-tag">✓ approved — draft queued from J. Park's inbox</div>
+    </div>
+    <div class="card intro-card" id="intro2">
+      <div>
+        <div class="pair">Marcus Oyelaran <span class="link">⟶</span> Dana Kimura + Ale Fontán</div>
+        <div class="reason">Marcus's clinical-staffing whitespace overlaps the pair's records-automation exploration. All three in SF; co-attendance probability next salon: <em>92%</em> — or intro now and seat them together.</div>
+      </div>
+      <div class="intro-actions"><button class="btn primary" onclick="acceptIntro('intro2')">Approve intro</button><button class="btn">Skip</button></div>
+      <div class="accepted-tag">✓ approved — draft queued</div>
+    </div>
+    <div class="card intro-card" id="intro3">
+      <div>
+        <div class="pair">Sofia Andersen <span class="link">⟶</span> Recruit: ex-Plaid platform PM <span class="badge sage">talent</span></div>
+        <div class="reason">Sofia told J. Park she needs a founding PM. Graph holds 3 platform PMs who exited Plaid this quarter; top match co-attended two events with her. <em>Talent intro = pre-investment value.</em></div>
+      </div>
+      <div class="intro-actions"><button class="btn primary" onclick="acceptIntro('intro3')">Approve intro</button><button class="btn">Skip</button></div>
+      <div class="accepted-tag">✓ approved — draft queued</div>
+    </div>
+    <div class="card" style="padding:14px 18px;display:flex;gap:22px;font-family:var(--mono);font-size:11px;color:var(--text-dim)">
+      <span>batch acceptance rate <b style="color:var(--signal)">71%</b></span>
+      <span>rated valuable (30d) <b style="color:var(--up)">84%</b></span>
+      <span>intros → deals sourced <b style="color:var(--text)">3 of last 5</b></span>
+    </div>
+  </section>
+
+  <!-- ═══════════ DASH ═══════════ -->
+  <section class="screen" id="dash">
+    <div class="eyebrow">Partner &amp; LP view · Q3 to date</div>
+    <h1>Flywheel</h1>
+    <p class="sub">Three loops, one spine. If a number here moves, a pipe upstream explains why.</p>
+    <div class="kpis">
+      <div class="card kpi"><div class="label">Sourced pre-fundraise</div><div class="value" style="color:var(--signal)">67%</div><div class="delta d up">▲ from 41% · Q1</div></div>
+      <div class="card kpi"><div class="label">Graph size · resolved</div><div class="value">4,218</div><div class="delta d up">▲ 312 this month</div></div>
+      <div class="card kpi"><div class="label">First-touch → term sheet</div><div class="value">117d</div><div class="delta d up">▼ 38d vs baseline</div></div>
+      <div class="card kpi"><div class="label">90-day repeat attendance</div><div class="value">58%</div><div class="delta d down">▼ 3pts — investigate</div></div>
+    </div>
+    <div class="loops">
+      <div class="card loop">
+        <h3>Signal loop</h3><div class="lsub">events + exhaust → earlier deal flow</div>
+        <div class="bar-row"><div>Radar candidates reviewed / wk<div class="track"><i style="width:80%"></i></div></div><div class="num">24</div></div>
+        <div class="bar-row"><div>Precision (reviewed → meeting)<div class="track"><i style="width:46%"></i></div></div><div class="num">46%</div></div>
+        <div class="bar-row"><div>Stealth detections this quarter<div class="track"><i style="width:60%"></i></div></div><div class="num">9</div></div>
+      </div>
+      <div class="card loop sage">
+        <h3>Community loop</h3><div class="lsub">events → relationships → retention</div>
+        <div class="bar-row sage"><div>Event NPS (rolling)<div class="track"><i style="width:72%"></i></div></div><div class="num">72</div></div>
+        <div class="bar-row sage"><div>New members via referral<div class="track"><i style="width:44%"></i></div></div><div class="num">44%</div></div>
+        <div class="bar-row sage"><div>Co-attendance edges / event<div class="track"><i style="width:66%"></i></div></div><div class="num">380</div></div>
+      </div>
+      <div class="card loop">
+        <h3>Value loop</h3><div class="lsub">intros + RFS → allocation access</div>
+        <div class="bar-row blue"><div>Intros accepted (30d)<div class="track"><i style="width:71%"></i></div></div><div class="num">71%</div></div>
+        <div class="bar-row blue"><div>Founders helped pre-investment<div class="track"><i style="width:55%"></i></div></div><div class="num">31</div></div>
+        <div class="bar-row blue"><div>Active RFS driving convos<div class="track"><i style="width:83%"></i></div></div><div class="num">5 of 6</div></div>
+      </div>
+    </div>
+    <div class="card feed">
+      <div class="feed-item"><div class="t">09:41</div><div><span class="src">incorp ·</span> Meridian Pay Inc matched to Priya Raghavan — radar score +12</div></div>
+      <div class="feed-item"><div class="t">09:12</div><div><span class="src">luma ·</span> AI × Compliance salon: 61 RSVPs, 14 net-new to graph</div></div>
+      <div class="feed-item"><div class="t">08:55</div><div><span class="src">latency ·</span> Rahul Mehta reply latency ↑ 6× — decay flag raised</div></div>
+      <div class="feed-item"><div class="t">08:30</div><div><span class="src">expense ·</span> 2nd GP dinner with Sofia Andersen — conviction signal logged</div></div>
+      <div class="feed-item"><div class="t">08:02</div><div><span class="src">intro ·</span> Tom Esposito rated last week's intro "very valuable"</div></div>
+    </div>
+  </section>
+
+  </main>
+</div>
+
+<script>
+const buttons=document.querySelectorAll('.nav button[data-screen]');
+const screens=document.querySelectorAll('.screen');
+function show(id){
+  screens.forEach(s=>s.classList.toggle('active',s.id===id));
+  buttons.forEach(b=>b.classList.toggle('active',b.dataset.screen===id));
+}
+buttons.forEach(b=>b.addEventListener('click',()=>show(b.dataset.screen)));
+document.addEventListener('keydown',e=>{
+  if(e.target.tagName==='INPUT')return;
+  const map={'1':'radar','2':'graph','3':'rfs','4':'intros','5':'dash'};
+  if(map[e.key])show(map[e.key]);
+});
+function acceptIntro(id){document.getElementById(id).classList.add('accepted');}
+document.querySelectorAll('.chip').forEach(c=>c.addEventListener('click',()=>{
+  document.querySelectorAll('.chip').forEach(x=>x.classList.remove('active'));
+  c.classList.add('active');
+}));
+</script>
+</body>
+</html>

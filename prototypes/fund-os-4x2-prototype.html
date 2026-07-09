@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Fund OS — 4×2 Signal Desk</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#0f1512;--panel:#161e1a;--panel-2:#1c2620;--line:#26332c;
+  --text:#e8ece9;--text-dim:#8fa198;--text-faint:#5c6b63;
+  --signal:#e8a33d;--signal-dim:#8a6526;
+  --up:#7fbf9e;--down:#d47b6a;--cold:#5f8ba8;
+  --mono:'IBM Plex Mono',ui-monospace,monospace;
+  --disp:'Space Grotesk',sans-serif;--body:'Inter',system-ui,sans-serif;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--ink);color:var(--text);font-family:var(--body);font-size:14px;line-height:1.5;-webkit-font-smoothing:antialiased}
+button{font-family:inherit;cursor:pointer}
+
+.shell{display:flex;min-height:100vh}
+.nav{width:216px;flex-shrink:0;border-right:1px solid var(--line);padding:22px 12px;position:sticky;top:0;height:100vh;overflow-y:auto}
+.brand{font-family:var(--disp);font-weight:700;font-size:16px;padding:0 10px 16px;display:flex;align-items:center;gap:9px}
+.brand .dot{width:9px;height:9px;border-radius:50%;background:var(--signal);box-shadow:0 0 10px var(--signal)}
+.mod{font-family:var(--mono);font-size:9.5px;letter-spacing:.13em;text-transform:uppercase;color:var(--text-faint);padding:14px 10px 5px}
+.nav button.tab{display:block;width:100%;text-align:left;background:none;border:none;color:var(--text-dim);padding:8px 10px;border-radius:8px;font-size:13px;font-weight:500}
+.nav button.tab:hover{background:var(--panel);color:var(--text)}
+.nav button.tab.active{background:var(--panel-2);color:var(--signal)}
+.nav button.tab:focus-visible{outline:2px solid var(--signal);outline-offset:1px}
+
+.main{flex:1;padding:26px 32px 60px;max-width:1150px}
+.screen{display:none}
+.screen.active{display:block;animation:fade .22s ease}
+@keyframes fade{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
+@media(prefers-reduced-motion:reduce){.screen.active{animation:none}}
+
+.eyebrow{font-family:var(--mono);font-size:10.5px;letter-spacing:.15em;text-transform:uppercase;color:var(--signal);margin-bottom:6px}
+h1{font-family:var(--disp);font-size:24px;font-weight:600;letter-spacing:-.01em;margin-bottom:4px}
+.sub{color:var(--text-dim);font-size:13px;margin-bottom:20px;max-width:660px}
+.sub em{color:var(--text);font-style:normal}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:11px}
+.badge{font-family:var(--mono);font-size:10px;padding:2px 7px;border-radius:5px;border:1px solid var(--line);color:var(--text-dim);white-space:nowrap}
+.badge.amber{color:var(--signal);border-color:var(--signal-dim)}
+.badge.sage{color:var(--up);border-color:#3c5c4c}
+.badge.blue{color:var(--cold);border-color:#37536a}
+.badge.clay{color:var(--down);border-color:#6a4038}
+.num{font-family:var(--mono)}
+.btn{background:var(--panel-2);border:1px solid var(--line);color:var(--text);border-radius:8px;padding:6px 13px;font-size:12px;font-weight:500}
+.btn:hover{border-color:var(--signal-dim)}
+.btn.primary{background:var(--signal);border-color:var(--signal);color:#1a1408;font-weight:600}
+.sec-h{font-family:var(--mono);font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--text-faint);padding:13px 16px 9px}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:14px;align-items:start}
+.row{display:grid;gap:12px;padding:11px 16px;border-top:1px solid var(--line);font-size:12.5px;align-items:center}
+.row .m{color:var(--text-dim);font-size:11px;margin-top:2px;line-height:1.45}
+.row .m em{color:var(--signal);font-style:normal}
+
+/* pipes screen */
+.pipe{grid-template-columns:110px 1fr auto auto}
+.pipe .src{font-family:var(--mono);font-size:11px;color:var(--cold)}
+.depth{display:flex;gap:2px}
+.depth i{width:14px;height:5px;border-radius:2px;background:var(--line)}
+.depth.d1 i:nth-child(-n+1),.depth.d2 i:nth-child(-n+2),.depth.d3 i:nth-child(-n+3),.depth.d4 i:nth-child(-n+4){background:var(--signal)}
+.vs{grid-template-columns:150px 1fr 1fr}
+.vs .h{font-family:var(--mono);font-size:10px;letter-spacing:.08em;text-transform:uppercase}
+.vs .a{color:var(--text-faint)}
+.vs .b{color:var(--text)}
+.vs .b em{color:var(--signal);font-style:normal}
+
+/* resolution screen */
+.merge-vis{padding:16px;display:grid;grid-template-columns:1fr 60px 1fr;gap:8px;align-items:center}
+.frag{border:1px dashed var(--line);border-radius:8px;padding:8px 11px;font-size:11.5px;margin-bottom:7px;color:var(--text-dim)}
+.frag b{color:var(--text);font-weight:600}
+.frag .src{font-family:var(--mono);font-size:9.5px;color:var(--cold)}
+.arrow-col{text-align:center;font-family:var(--mono);color:var(--signal);font-size:18px}
+.golden{border:1px solid var(--signal-dim);border-radius:10px;padding:13px 14px;background:var(--panel-2)}
+.golden .kv{display:flex;justify-content:space-between;font-size:12px;padding:2.5px 0}
+.golden .kv span:first-child{color:var(--text-dim)}
+.conf{font-family:var(--mono);font-size:10px;color:var(--up)}
+
+/* targeting */
+.qbar{display:flex;gap:8px;flex-wrap:wrap;padding:14px 16px;border-bottom:1px solid var(--line)}
+.qchip{font-family:var(--mono);font-size:11px;background:var(--panel-2);border:1px solid var(--signal-dim);color:var(--signal);border-radius:6px;padding:4px 10px}
+.qchip.op{border-color:var(--line);color:var(--text-faint)}
+.tgt{grid-template-columns:1fr 130px 90px auto}
+.stage-flow{display:flex;gap:0;padding:16px;overflow-x:auto}
+.stage{flex:1;min-width:120px;border:1px solid var(--line);padding:11px 13px;position:relative}
+.stage:first-child{border-radius:9px 0 0 9px}
+.stage:last-child{border-radius:0 9px 9px 0}
+.stage+.stage{border-left:none}
+.stage h4{font-family:var(--mono);font-size:9.5px;letter-spacing:.09em;text-transform:uppercase;color:var(--text-faint);margin-bottom:3px}
+.stage .n{font-family:var(--disp);font-size:22px;font-weight:600}
+.stage .cv{font-family:var(--mono);font-size:10px;color:var(--up);margin-top:2px}
+.stage.hot{background:var(--panel-2)}
+.stage.hot .n{color:var(--signal)}
+
+/* nurturing */
+.journey{grid-template-columns:1fr 150px auto}
+.nba{border-left:3px solid var(--signal);background:var(--panel-2);border-radius:0 8px 8px 0;padding:9px 12px;font-size:12px;margin-top:7px}
+.nba b{font-weight:600}
+.ledger{grid-template-columns:96px 1fr auto}
+.ledger .d{font-family:var(--mono);font-size:10.5px;color:var(--text-faint)}
+.bal{display:flex;gap:20px;padding:14px 16px;font-family:var(--mono);font-size:11px;color:var(--text-dim);border-top:1px solid var(--line)}
+.bal b{color:var(--signal)}
+
+/* ecosystem */
+.heat{display:grid;grid-template-columns:repeat(12,1fr);gap:3px;padding:14px 16px}
+.heat i{aspect-ratio:1;border-radius:3px;background:var(--panel-2)}
+.heat i.h1{background:#2c3a31}.heat i.h2{background:#4a5c3a}.heat i.h3{background:#8a6526}.heat i.h4{background:var(--signal)}
+.table-map{padding:16px;display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.tbl{border:1px solid var(--line);border-radius:10px;padding:11px 12px}
+.tbl h4{font-family:var(--mono);font-size:10px;color:var(--text-faint);letter-spacing:.09em;text-transform:uppercase;margin-bottom:7px}
+.seat{font-size:11.5px;padding:2.5px 0;color:var(--text-dim)}
+.seat b{color:var(--text);font-weight:500}
+.seat .why{color:var(--text-faint);font-size:10px}
+.tbl.hot{border-color:var(--signal-dim)}
+.tbl.hot h4{color:var(--signal)}
+@media(max-width:960px){
+  .shell{flex-direction:column}
+  .nav{width:100%;height:auto;position:static;display:flex;overflow-x:auto;border-right:none;border-bottom:1px solid var(--line);padding:10px;gap:4px}
+  .brand,.mod{display:none}
+  .nav button.tab{white-space:nowrap;width:auto}
+  .main{padding:18px 14px 50px}
+  .two,.table-map{grid-template-columns:1fr}
+  .merge-vis{grid-template-columns:1fr}
+  .arrow-col{transform:rotate(90deg)}
+}
+</style>
+</head>
+<body>
+<div class="shell">
+<nav class="nav" aria-label="Modules">
+  <div class="brand"><span class="dot"></span>Fund OS</div>
+  <div class="mod">1 · VC-native CDP</div>
+  <button class="tab active" data-s="cdp1">Capture Console</button>
+  <button class="tab" data-s="cdp2">Identity Resolution</button>
+  <div class="mod">2 · Founder Targeting</div>
+  <button class="tab" data-s="tgt1">Cohort Builder</button>
+  <button class="tab" data-s="tgt2">Outreach Orchestrator</button>
+  <div class="mod">3 · Founder Nurturing</div>
+  <button class="tab" data-s="nur1">Journey Stages</button>
+  <button class="tab" data-s="nur2">Value Ledger</button>
+  <div class="mod">4 · Ecosystem</div>
+  <button class="tab" data-s="eco1">Online Health</button>
+  <button class="tab" data-s="eco2">Offline Ops</button>
+</nav>
+
+<main class="main">
+
+<!-- ════ 1a CAPTURE CONSOLE ════ -->
+<section class="screen active" id="cdp1">
+  <div class="eyebrow">Module 1 · VC-native CDP</div>
+  <h1>Capture Console</h1>
+  <p class="sub">A consumer CDP tracks <em>millions of users, shallowly, via SDKs you embed</em>. This tracks <em>thousands of people, deeply, via admin-side pipes</em> — because the "users" are GPs and founders whose workflow cannot change.</p>
+  <div class="two">
+    <div class="card">
+      <div class="sec-h">Live pipes · all server-side, zero client installs</div>
+      <div class="row pipe"><span class="src">gmail-meta</span><span>Headers, participants, latency — <em>no bodies</em><div class="m">domain-wide delegation · granted once by IT</div></span><div class="depth d4"><i></i><i></i><i></i><i></i></div><span class="badge sage">syncing</span></div>
+      <div class="row pipe"><span class="src">gcal</span><span>Meeting graph, reschedule flow, lead times<div class="m">read scope on fund domain</div></span><div class="depth d4"><i></i><i></i><i></i><i></i></div><span class="badge sage">syncing</span></div>
+      <div class="row pipe"><span class="src">luma</span><span>RSVPs, check-ins, seating, guest metadata<div class="m">API key · webhook push</div></span><div class="depth d4"><i></i><i></i><i></i><i></i></div><span class="badge sage">syncing</span></div>
+      <div class="row pipe"><span class="src">zoom+granola</span><span>Attendance + transcript entities<div class="m">admin reports API · local notetaker, no bot</div></span><div class="depth d3"><i></i><i></i><i></i><i></i></div><span class="badge sage">syncing</span></div>
+      <div class="row pipe"><span class="src">slack</span><span>Passive listener · #deals, #fintech, #intros<div class="m">read-only events API</div></span><div class="depth d3"><i></i><i></i><i></i><i></i></div><span class="badge sage">syncing</span></div>
+      <div class="row pipe"><span class="src">expense+travel</span><span>Dinners, flights — attention money trail<div class="m">Ramp + Navan exports, nightly</div></span><div class="depth d2"><i></i><i></i><i></i><i></i></div><span class="badge blue">nightly</span></div>
+      <div class="row pipe"><span class="src">enrichment</span><span>LinkedIn moves, GitHub, incorporations<div class="m">Clay + PDL sweeps, keyed off resolved IDs</div></span><div class="depth d2"><i></i><i></i><i></i><i></i></div><span class="badge blue">nightly</span></div>
+      <div class="row pipe"><span class="src">gmail-content</span><span>Selective body ingestion · deal threads only<div class="m">policy-gated · partner-approved label</div></span><div class="depth d1"><i></i><i></i><i></i><i></i></div><span class="badge clay">gated</span></div>
+    </div>
+    <div class="card">
+      <div class="sec-h">Why this is not Segment</div>
+      <div class="row vs"><span class="h">&nbsp;</span><span class="h a">Consumer CDP</span><span class="h b" style="color:var(--signal)">VC-native CDP</span></div>
+      <div class="row vs"><span class="h a">Scale</span><span class="a">10M anonymous users</span><span class="b"><em>~4K named people</em> who matter</span></div>
+      <div class="row vs"><span class="h a">Instrumentation</span><span class="a">SDK embedded in <b>your</b> product</span><span class="b">Pipes into <em>tools you don't own</em> — Gmail, Luma, Zoom</span></div>
+      <div class="row vs"><span class="h a">Consent model</span><span class="a">Cookie banner, per-user</span><span class="b"><em>Admin-granted once</em>; users never see it</span></div>
+      <div class="row vs"><span class="h a">Depth</span><span class="a">Pageviews, clicks</span><span class="b">Latency, seating, transcripts, <em>money trail</em></span></div>
+      <div class="row vs"><span class="h a">Selectivity</span><span class="a">Capture everything, sample later</span><span class="b">Capture <em>selectively by tier</em> — metadata default, content gated</span></div>
+      <div class="row vs"><span class="h a">Activation</span><span class="a">Ad audiences, email blasts</span><span class="b">One radar review + intro batch <em>per week</em></span></div>
+      <div class="row vs"><span class="h a">Failure mode</span><span class="a">Data bloat</span><span class="b">Trust breach — hence the <em>gated tier</em></span></div>
+    </div>
+  </div>
+</section>
+
+<!-- ════ 1b IDENTITY RESOLUTION ════ -->
+<section class="screen" id="cdp2">
+  <div class="eyebrow">Module 1 · VC-native CDP</div>
+  <h1>Identity Resolution</h1>
+  <p class="sub">Six fragments, one golden record. Email-first matching, fuzzy fallback, confidence-scored — and reversible, because the raw log is append-only.</p>
+  <div class="card">
+    <div class="sec-h">Merge preview · Priya Raghavan · confidence 0.97</div>
+    <div class="merge-vis">
+      <div>
+        <div class="frag"><span class="src">luma</span><br><b>priya.r@gmail.com</b> · 7 events, 2 no-shows</div>
+        <div class="frag"><span class="src">gmail-meta</span><br><b>priya@stripe.com</b> · 41-min GP reply latency</div>
+        <div class="frag"><span class="src">gmail-meta</span><br><b>priya@meridianpay.io</b> · new domain, 9 days</div>
+        <div class="frag"><span class="src">zoom</span><br><b>"Priya R"</b> · 4 sessions · fuzzy name match .91</div>
+        <div class="frag"><span class="src">slack</span><br><b>@priyar</b> · 23 msgs · matched via profile email</div>
+        <div class="frag"><span class="src">incorp</span><br><b>Meridian Pay Inc</b> · DE · domain match</div>
+      </div>
+      <div class="arrow-col">⟶</div>
+      <div class="golden">
+        <div style="font-family:var(--disp);font-weight:600;margin-bottom:6px">Priya Raghavan <span class="conf">0.97</span></div>
+        <div class="kv"><span>Primary email</span><span class="num">priya@meridianpay.io</span></div>
+        <div class="kv"><span>Prior identity</span><span class="num">priya@stripe.com</span></div>
+        <div class="kv"><span>Company edge</span><span class="num">Meridian Pay · founder</span></div>
+        <div class="kv"><span>Interactions</span><span class="num">38 across 6 sources</span></div>
+        <div class="kv"><span>Warmth</span><span class="num" style="color:var(--signal)">78</span></div>
+        <div class="kv"><span>Merge policy</span><span class="num">auto ≥0.95 · else queue</span></div>
+        <div style="display:flex;gap:8px;margin-top:10px"><button class="btn primary">Confirm merge</button><button class="btn">Split</button></div>
+      </div>
+    </div>
+  </div>
+  <div class="card" style="margin-top:14px">
+    <div class="sec-h">Review queue · below auto-merge threshold</div>
+    <div class="row" style="grid-template-columns:1fr auto auto"><span>"A. Chen" (zoom) ↔ alex.chen@vertexlabs.co (gmail) <div class="m">shared 2 meetings, name similarity .84 — <em>common-name risk</em></div></span><span class="num" style="color:var(--down)">0.71</span><button class="btn">Review</button></div>
+    <div class="row" style="grid-template-columns:1fr auto auto"><span>m.oyelaran@gmail ↔ marcus@stealth-co.dev <div class="m">same device fingerprint at 2 events · no email link yet</div></span><span class="num" style="color:var(--signal)">0.88</span><button class="btn">Review</button></div>
+  </div>
+</section>
+
+<!-- ════ 2a COHORT BUILDER ════ -->
+<section class="screen" id="tgt1">
+  <div class="eyebrow">Module 2 · Founder targeting</div>
+  <h1>Cohort Builder</h1>
+  <p class="sub">Query the graph in behavior, not demographics. This cohort: <em>likely founders who haven't incorporated yet</em> — the formation window.</p>
+  <div class="card">
+    <div class="qbar">
+      <span class="qchip">exited payments incumbent &lt; 90d</span><span class="qchip op">AND</span>
+      <span class="qchip">events attended ≥ 2</span><span class="qchip op">AND</span>
+      <span class="qchip">no incorporation record</span><span class="qchip op">AND</span>
+      <span class="qchip">formation-readiness ≥ 70</span>
+      <button class="btn" style="margin-left:auto">Save cohort</button>
+    </div>
+    <div class="row tgt"><span><b>Priya Raghavan</b> <span class="badge amber">just incorporated — exiting cohort</span><div class="m">graduated to <em>active targeting</em> · 18 days from cohort-entry to incorporation</div></span><span class="badge blue">ex-Stripe ledgering</span><span class="num" style="color:var(--signal)">FR 86</span><button class="btn">Open</button></div>
+    <div class="row tgt"><span><b>Yuki Tanaka</b><div class="m">exited Adyen risk org · attended 2 salons · asked 3 reconciliation questions</div></span><span class="badge blue">ex-Adyen risk</span><span class="num" style="color:var(--signal)">FR 81</span><button class="btn">Open</button></div>
+    <div class="row tgt"><span><b>Sam Okafor</b><div class="m">exited Marqeta · high thread-revival trace · zero public signal — <em>nobody else sees this person</em></div></span><span class="badge blue">ex-Marqeta issuing</span><span class="num" style="color:var(--signal)">FR 77</span><button class="btn">Open</button></div>
+    <div class="row tgt"><span><b>Lena Vogel</b><div class="m">exited Stripe billing · 4 events · documentation-heavy shape → <em>pair candidate</em>, not solo</div></span><span class="badge blue">ex-Stripe billing</span><span class="num">FR 72</span><button class="btn">Open</button></div>
+  </div>
+  <div class="card" style="margin-top:14px">
+    <div class="sec-h">Cohort math</div>
+    <div class="stage-flow">
+      <div class="stage"><h4>Graph population</h4><div class="n">4,218</div></div>
+      <div class="stage"><h4>Recent incumbent exits</h4><div class="n">61</div><div class="cv">1.4%</div></div>
+      <div class="stage"><h4>+ event engaged</h4><div class="n">19</div><div class="cv">31%</div></div>
+      <div class="stage hot"><h4>+ FR ≥ 70 · no incorp</h4><div class="n">4</div><div class="cv">the window</div></div>
+      <div class="stage"><h4>RFS matched</h4><div class="n">3</div><div class="cv">RFS-01/02</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- ════ 2b OUTREACH ORCHESTRATOR ════ -->
+<section class="screen" id="tgt2">
+  <div class="eyebrow">Module 2 · Founder targeting</div>
+  <h1>Outreach Orchestrator</h1>
+  <p class="sub">No sequences, no sendgrid, no new tools for the GP. The system <em>drafts into the GP's own Gmail</em> and books through their existing calendar — outreach that looks handwritten because the last mile is.</p>
+  <div class="card">
+    <div class="sec-h">Queued this week · each routes through owner's inbox as a draft</div>
+    <div class="row" style="grid-template-columns:1fr 140px auto auto"><span><b>Yuki Tanaka</b> — invite: Fintech Infra Dinner #4<div class="m">hook found by system: her reconciliation question ↔ Tom Esposito's exact pain · <em>seated together if accepted</em></div></span><span class="badge blue">owner: J. Park</span><span class="badge amber">draft in gmail</span><button class="btn primary">Approve</button></div>
+    <div class="row" style="grid-template-columns:1fr 140px auto auto"><span><b>Sam Okafor</b> — coffee, no agenda<div class="m">pre-idea stage → <em>relationship play, not pitch ask</em> · optimal send: Thu am (his reply-latency window)</div></span><span class="badge blue">owner: M. Osei</span><span class="badge amber">draft in gmail</span><button class="btn primary">Approve</button></div>
+    <div class="row" style="grid-template-columns:1fr 140px auto auto"><span><b>Lena Vogel</b> — intro to Dana Kimura (pair thesis)<div class="m">complementary FR shapes · both RFS-02 adjacent · <em>formation attempt #3 this quarter</em></div></span><span class="badge blue">owner: J. Park</span><span class="badge clay">held — Dana travel</span><button class="btn">Reschedule</button></div>
+  </div>
+  <div class="two" style="margin-top:14px">
+    <div class="card">
+      <div class="sec-h">Why drafts, not sends</div>
+      <div class="row" style="grid-template-columns:1fr"><span>GP voice is the asset — the system finds <em>who + why + when</em>, the GP owns the words. Edit rate 34%, which is the point.<div class="m">approval → draft appears in gmail with hook pre-written · one tap to send from their phone</div></span></div>
+      <div class="row" style="grid-template-columns:1fr"><span>Reply rate: system-timed drafts vs. GP ad-hoc<div class="m"><em>62% vs 38%</em> — timing from reply-latency windows in the graph</div></span></div>
+    </div>
+    <div class="card">
+      <div class="sec-h">Coverage guardrail</div>
+      <div class="row" style="grid-template-columns:1fr auto"><span>Cohort members with zero touch in 30d<div class="m">targeting decays without contact — surfaced weekly</div></span><span class="num" style="color:var(--down);font-size:20px">2</span></div>
+      <div class="row" style="grid-template-columns:1fr auto"><span>Double-coverage collisions caught<div class="m">two GPs courting same founder unknowingly</div></span><span class="num" style="font-size:20px">1</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- ════ 3a JOURNEY STAGES ════ -->
+<section class="screen" id="nur1">
+  <div class="eyebrow">Module 3 · Founder nurturing</div>
+  <h1>Journey Stages</h1>
+  <p class="sub">Lifecycle marketing, rebuilt for founders: stages are inferred from exhaust, never self-reported, and every stage has one next-best-action a human executes.</p>
+  <div class="card">
+    <div class="stage-flow">
+      <div class="stage"><h4>Community</h4><div class="n">3,904</div><div class="cv">events + slack</div></div>
+      <div class="stage"><h4>Pre-idea</h4><div class="n">61</div><div class="cv">exit detected</div></div>
+      <div class="stage hot"><h4>Forming</h4><div class="n">14</div><div class="cv">incorp/domain</div></div>
+      <div class="stage hot"><h4>Raising</h4><div class="n">8</div><div class="cv">deck circulating</div></div>
+      <div class="stage"><h4>Portfolio</h4><div class="n">23</div><div class="cv">invested</div></div>
+    </div>
+  </div>
+  <div class="card" style="margin-top:14px">
+    <div class="sec-h">Stage transitions this week · with next-best-action</div>
+    <div class="row journey"><span><b>Priya Raghavan</b> · pre-idea ⟶ <b style="color:var(--signal)">forming</b><div class="m">trigger: incorporation + new domain in headers</div><div class="nba"><b>NBA:</b> design-partner intro (Tom E.) before deck exists — value lands hardest pre-raise</div></span><span class="badge amber">window: ~6 wks</span><button class="btn primary">Execute</button></div>
+    <div class="row journey"><span><b>Marcus Oyelaran</b> · forming ⟶ <b style="color:var(--signal)">raising</b><div class="m">trigger: deck attachment detected circulating to 3 funds (metadata only)</div><div class="nba"><b>NBA:</b> J. Park same-week meeting — our reply-latency edge is 41 min vs. cohort 2 days</div></span><span class="badge clay">competitive</span><button class="btn primary">Execute</button></div>
+    <div class="row journey"><span><b>Dana Kimura</b> · community ⟶ <b style="color:var(--signal)">pre-idea</b><div class="m">trigger: Hyland exit + engagement streak</div><div class="nba"><b>NBA:</b> invite to RFS-02 salon · seat with Ale Fontán (pair thesis) — <em>nurture into formation</em></div></span><span class="badge blue">patient</span><button class="btn primary">Execute</button></div>
+    <div class="row journey"><span><b>Rahul Mehta</b> · raising ⟶ <b style="color:var(--down)">dormant</b><div class="m">trigger: latency 6× + zero events 45d · likely termed elsewhere</div><div class="nba"><b>NBA:</b> graceful congrats note, keep community edge alive — <em>today's loss is next fund's first check</em></div></span><span class="badge clay">decay</span><button class="btn">Execute</button></div>
+  </div>
+</section>
+
+<!-- ════ 3b VALUE LEDGER ════ -->
+<section class="screen" id="nur2">
+  <div class="eyebrow">Module 3 · Founder nurturing</div>
+  <h1>Value Ledger</h1>
+  <p class="sub">The fund's give/get balance sheet per founder. Nurturing means <em>value delivered before any investment</em> — tracked, because "we're helpful" should be a number, not a vibe.</p>
+  <div class="two">
+    <div class="card">
+      <div class="sec-h">Priya Raghavan · pre-investment ledger</div>
+      <div class="row ledger"><span class="d">Jun 28</span><span>Intro → Tom Esposito (design partner)<div class="m">accepted in 3 hrs · rated "very valuable"</div></span><span class="badge sage">landed</span></div>
+      <div class="row ledger"><span class="d">Jun 24</span><span>Seated at table 3 with 2 marketplace operators<div class="m">3 follow-up threads within 72 hrs</div></span><span class="badge sage">landed</span></div>
+      <div class="row ledger"><span class="d">Jun 12</span><span>Talent: 2 ex-Plaid eng candidates shared<div class="m">1 in her interview loop now</div></span><span class="badge amber">in flight</span></div>
+      <div class="row ledger"><span class="d">Jun 02</span><span>RFS-01 memo + market map sent<div class="m">she quoted it back in Zoom — thesis resonance confirmed</div></span><span class="badge sage">landed</span></div>
+      <div class="bal"><span>value events <b>4</b></span><span>asks made <b>0</b></span><span>warmth Δ 90d <b>+31</b></span></div>
+    </div>
+    <div class="card">
+      <div class="sec-h">Portfolio-wide nurture health</div>
+      <div class="row" style="grid-template-columns:1fr auto"><span>Founders with ≥1 value event / 60d<div class="m">forming + raising stages</div></span><span class="num" style="font-size:20px;color:var(--up)">19 / 22</span></div>
+      <div class="row" style="grid-template-columns:1fr auto"><span>Give:ask ratio (fund-wide)<div class="m">target ≥ 3:1 pre-investment</div></span><span class="num" style="font-size:20px;color:var(--signal)">3.8 : 1</span></div>
+      <div class="row" style="grid-template-columns:1fr auto"><span>Value → allocation conversion<div class="m">founders we helped who gave us allocation when raising</div></span><span class="num" style="font-size:20px">7 / 9</span></div>
+      <div class="row" style="grid-template-columns:1fr auto"><span>Neglect alerts<div class="m">high-FR founders, zero value events 60d</div></span><span class="num" style="font-size:20px;color:var(--down)">3</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- ════ 4a ONLINE HEALTH ════ -->
+<section class="screen" id="eco1">
+  <div class="eyebrow">Module 4 · Ecosystem</div>
+  <h1>Online Health</h1>
+  <p class="sub">The digital commons as a leading indicator: activity heat, answer velocity, and who's becoming gravitational — all from the passive Slack listener.</p>
+  <div class="two">
+    <div class="card">
+      <div class="sec-h">Community heat · 12 weeks × channels</div>
+      <div class="heat" id="heat" aria-label="activity heatmap"></div>
+      <div class="row" style="grid-template-columns:1fr"><span style="font-size:11.5px;color:var(--text-dim)">#fintech surging 4 wks straight — <em style="color:var(--signal);font-style:normal">correlates with RFS-01 publish</em> · #legaltech cooling → watchlist candidate W-11 stays parked</span></div>
+    </div>
+    <div class="card">
+      <div class="sec-h">Gravity leaderboard · answers that get re-shared</div>
+      <div class="row" style="grid-template-columns:1fr auto auto"><span><b>Jordan Wells</b><div class="m">14 re-shares · distribution instinct, watch durability</div></span><span class="num">gravity 91</span><span class="badge blue">teacher</span></div>
+      <div class="row" style="grid-template-columns:1fr auto auto"><span><b>Priya Raghavan</b><div class="m">answers reconciliation questions she could hoard — <em>teaching w/o credential</em></div></span><span class="num">gravity 84</span><span class="badge amber">founder</span></div>
+      <div class="row" style="grid-template-columns:1fr auto auto"><span><b>Tom Esposito</b><div class="m">operator demand-signal source · 3 RFS seeds traced to his threads</div></span><span class="num">gravity 79</span><span class="badge sage">design partner</span></div>
+      <div class="row" style="grid-template-columns:1fr auto"><span>Unanswered questions &gt; 48h<div class="m">community debt — each one is a whitespace or neglect flag</div></span><span class="num" style="color:var(--down);font-size:20px">6</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- ════ 4b OFFLINE OPS ════ -->
+<section class="screen" id="eco2">
+  <div class="eyebrow">Module 4 · Ecosystem</div>
+  <h1>Offline Ops</h1>
+  <p class="sub">The dinner is the algorithm's output: seating optimized from the graph, capture handled by the venue, magic left un-instrumented where it counts.</p>
+  <div class="card">
+    <div class="sec-h">Fintech Infra Dinner #4 · Thu · 24 seats · seating solved for edge-creation</div>
+    <div class="table-map">
+      <div class="tbl hot"><h4>Table 1 · formation</h4>
+        <div class="seat"><b>Dana Kimura</b><div class="why">pair thesis, seat adjacent →</div></div>
+        <div class="seat"><b>Ale Fontán</b><div class="why">complementary FR shape</div></div>
+        <div class="seat"><b>M. Osei (GP)</b><div class="why">observe, don't pitch</div></div>
+        <div class="seat"><b>records-mgmt operator ×2</b><div class="why">live demand signal for RFS-02</div></div>
+      </div>
+      <div class="tbl hot"><h4>Table 2 · deal heat</h4>
+        <div class="seat"><b>Yuki Tanaka</b><div class="why">cohort target, first dinner</div></div>
+        <div class="seat"><b>Tom Esposito</b><div class="why">her question = his pain</div></div>
+        <div class="seat"><b>J. Park (GP)</b><div class="why">owns both edges</div></div>
+      </div>
+      <div class="tbl"><h4>Table 3 · community</h4>
+        <div class="seat"><b>6 high-retention members</b><div class="why">no agenda — retention is the agenda</div></div>
+        <div class="seat"><b>2 net-new from referral</b><div class="why">seeded next to warmest hosts</div></div>
+      </div>
+    </div>
+  </div>
+  <div class="two" style="margin-top:14px">
+    <div class="card">
+      <div class="sec-h">Capture plan · invisible</div>
+      <div class="row" style="grid-template-columns:110px 1fr"><span class="badge blue">check-in</span><span>Luma QR at door — venue staff scan, guests do nothing</span></div>
+      <div class="row" style="grid-template-columns:110px 1fr"><span class="badge blue">seating</span><span>Chart photographed post-event → co-seating edges</span></div>
+      <div class="row" style="grid-template-columns:110px 1fr"><span class="badge blue">72h rule</span><span>A→B email within 72 hrs of co-attendance ⟹ inferred meeting</span></div>
+      <div class="row" style="grid-template-columns:110px 1fr"><span class="badge clay">not captured</span><span>Conversations. Deliberately. <em style="color:var(--text);font-style:normal">The moat is that it feels like a dinner.</em></span></div>
+    </div>
+    <div class="card">
+      <div class="sec-h">Last event → graph yield</div>
+      <div class="row" style="grid-template-columns:1fr auto"><span>New co-attendance edges</span><span class="num" style="font-size:20px">380</span></div>
+      <div class="row" style="grid-template-columns:1fr auto"><span>Inferred meetings (72h rule)</span><span class="num" style="font-size:20px">27</span></div>
+      <div class="row" style="grid-template-columns:1fr auto"><span>Net-new resolved identities</span><span class="num" style="font-size:20px;color:var(--signal)">14</span></div>
+      <div class="row" style="grid-template-columns:1fr auto"><span>Radar candidates sourced</span><span class="num" style="font-size:20px;color:var(--signal)">2</span></div>
+    </div>
+  </div>
+</section>
+
+</main>
+</div>
+
+<script>
+const tabs=document.querySelectorAll('.tab'),screens=document.querySelectorAll('.screen');
+tabs.forEach(t=>t.addEventListener('click',()=>{
+  tabs.forEach(x=>x.classList.remove('active'));t.classList.add('active');
+  screens.forEach(s=>s.classList.toggle('active',s.id===t.dataset.s));
+}));
+// heatmap
+const heat=document.getElementById('heat');
+const rows=[[1,1,2,1,2,2,3,3,3,4,4,4],[2,2,1,2,1,2,2,3,2,3,3,4],[1,2,2,2,3,2,2,2,3,3,2,3],[2,1,1,1,2,1,1,2,1,1,1,1],[0,1,1,2,1,2,2,2,3,2,3,3]];
+rows.forEach(r=>r.forEach(v=>{const i=document.createElement('i');if(v)i.className='h'+v;heat.appendChild(i);}));
+</script>
+</body>
+</html>

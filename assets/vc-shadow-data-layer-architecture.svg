@@ -1,0 +1,108 @@
+<svg viewBox="0 0 860 660" xmlns="http://www.w3.org/2000/svg" font-family="Helvetica, Arial, sans-serif">
+  <rect width="860" height="660" fill="#faf9f6"/>
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#8a8a8a"/>
+    </marker>
+  </defs>
+
+  <text x="430" y="24" text-anchor="middle" font-size="16" font-weight="700" fill="#222">Invisible Instrumentation: Shadow Data Layer ("Segment for the Fund")</text>
+
+  <!-- Layer 1: Sources -->
+  <text x="20" y="52" font-size="12" font-weight="700" fill="#666">1 · EXISTING SURFACES (no UI change)</text>
+  <g font-size="11" fill="#222">
+    <rect x="20" y="62" width="125" height="46" rx="8" fill="#eef2f7" stroke="#b8c4d0"/>
+    <text x="82" y="82" text-anchor="middle">Luma / Eventbrite</text>
+    <text x="82" y="98" text-anchor="middle" font-size="9" fill="#777">RSVP · check-in</text>
+
+    <rect x="157" y="62" width="125" height="46" rx="8" fill="#eef2f7" stroke="#b8c4d0"/>
+    <text x="219" y="82" text-anchor="middle">Google Calendar</text>
+    <text x="219" y="98" text-anchor="middle" font-size="9" fill="#777">meeting graph</text>
+
+    <rect x="294" y="62" width="125" height="46" rx="8" fill="#eef2f7" stroke="#b8c4d0"/>
+    <text x="356" y="82" text-anchor="middle">Gmail (metadata)</text>
+    <text x="356" y="98" text-anchor="middle" font-size="9" fill="#777">first touch · latency</text>
+
+    <rect x="431" y="62" width="125" height="46" rx="8" fill="#eef2f7" stroke="#b8c4d0"/>
+    <text x="493" y="82" text-anchor="middle">Zoom / Meet</text>
+    <text x="493" y="98" text-anchor="middle" font-size="9" fill="#777">online attendance</text>
+
+    <rect x="568" y="62" width="125" height="46" rx="8" fill="#eef2f7" stroke="#b8c4d0"/>
+    <text x="630" y="82" text-anchor="middle">Slack / Discord</text>
+    <text x="630" y="98" text-anchor="middle" font-size="9" fill="#777">engagement</text>
+
+    <rect x="705" y="62" width="135" height="46" rx="8" fill="#eef2f7" stroke="#b8c4d0"/>
+    <text x="772" y="82" text-anchor="middle">Forms / CRM</text>
+    <text x="772" y="98" text-anchor="middle" font-size="9" fill="#777">applications · deals</text>
+  </g>
+
+  <g stroke="#8a8a8a" stroke-width="1.4" marker-end="url(#arrow)">
+    <line x1="82" y1="108" x2="330" y2="156"/>
+    <line x1="219" y1="108" x2="380" y2="156"/>
+    <line x1="356" y1="108" x2="420" y2="156"/>
+    <line x1="493" y1="108" x2="460" y2="156"/>
+    <line x1="630" y1="108" x2="510" y2="156"/>
+    <line x1="772" y1="108" x2="560" y2="156"/>
+  </g>
+
+  <!-- Layer 2: Ingestion -->
+  <text x="20" y="176" font-size="12" font-weight="700" fill="#666">2 · INGESTION</text>
+  <rect x="230" y="160" width="400" height="50" rx="8" fill="#e7e3da" stroke="#c2bcae"/>
+  <text x="430" y="181" text-anchor="middle" font-size="11" font-weight="600" fill="#222">Webhooks (push) + Nightly API pulls (batch)</text>
+  <text x="430" y="199" text-anchor="middle" font-size="9" fill="#777">Vercel Cron workers · queue · retry</text>
+
+  <line x1="430" y1="210" x2="430" y2="238" stroke="#8a8a8a" stroke-width="1.4" marker-end="url(#arrow)"/>
+
+  <!-- Layer 3: Raw log -->
+  <text x="20" y="258" font-size="12" font-weight="700" fill="#666">3 · RAW EVENT LOG</text>
+  <rect x="230" y="242" width="400" height="50" rx="8" fill="#e7e3da" stroke="#c2bcae"/>
+  <text x="430" y="263" text-anchor="middle" font-size="11" font-weight="600" fill="#222">Append-only · immutable · source-stamped</text>
+  <text x="430" y="281" text-anchor="middle" font-size="9" fill="#777">Turso / Postgres — never destroy raw data</text>
+
+  <line x1="430" y1="292" x2="430" y2="320" stroke="#8a8a8a" stroke-width="1.4" marker-end="url(#arrow)"/>
+
+  <!-- Layer 4: Resolution -->
+  <text x="20" y="340" font-size="12" font-weight="700" fill="#666">4 · RESOLUTION</text>
+  <rect x="230" y="324" width="400" height="50" rx="8" fill="#e7e3da" stroke="#c2bcae"/>
+  <text x="430" y="345" text-anchor="middle" font-size="11" font-weight="600" fill="#222">Identity resolution (email-first, fuzzy match)</text>
+  <text x="430" y="363" text-anchor="middle" font-size="9" fill="#777">one person across Luma · Zoom · Gmail · Slack</text>
+
+  <rect x="670" y="324" width="170" height="50" rx="8" fill="#f2efe9" stroke="#c2bcae" stroke-dasharray="4 3"/>
+  <text x="755" y="345" text-anchor="middle" font-size="10" font-weight="600" fill="#222">Enrichment</text>
+  <text x="755" y="362" text-anchor="middle" font-size="9" fill="#777">Clay · PDL · LinkedIn · GitHub</text>
+  <line x1="670" y1="349" x2="634" y2="349" stroke="#8a8a8a" stroke-width="1.4" marker-end="url(#arrow)"/>
+
+  <line x1="430" y1="374" x2="430" y2="402" stroke="#8a8a8a" stroke-width="1.4" marker-end="url(#arrow)"/>
+
+  <!-- Layer 5: Graph -->
+  <text x="20" y="422" font-size="12" font-weight="700" fill="#666">5 · ECOSYSTEM GRAPH</text>
+  <rect x="230" y="406" width="400" height="56" rx="8" fill="#dbe7f0" stroke="#9db4c8"/>
+  <text x="430" y="428" text-anchor="middle" font-size="11" font-weight="700" fill="#222">Person · Org · Interaction (single spine)</text>
+  <text x="430" y="449" text-anchor="middle" font-size="9" fill="#777">co-attendance edges · intro threads · engagement scores</text>
+
+  <g stroke="#8a8a8a" stroke-width="1.4" marker-end="url(#arrow)">
+    <line x1="330" y1="462" x2="150" y2="514"/>
+    <line x1="430" y1="462" x2="430" y2="514"/>
+    <line x1="530" y1="462" x2="710" y2="514"/>
+  </g>
+
+  <!-- Layer 6: Products -->
+  <text x="20" y="507" font-size="12" font-weight="700" fill="#666">6 · PRODUCTS</text>
+  <g font-size="11" fill="#222">
+    <rect x="40" y="518" width="220" height="56" rx="8" fill="#eef2f7" stroke="#b8c4d0"/>
+    <text x="150" y="540" text-anchor="middle" font-weight="600">Sourcing Radar</text>
+    <text x="150" y="558" text-anchor="middle" font-size="9" fill="#777">weekly ranked watch-list for partners</text>
+
+    <rect x="320" y="518" width="220" height="56" rx="8" fill="#eef2f7" stroke="#b8c4d0"/>
+    <text x="430" y="540" text-anchor="middle" font-weight="600">Intro Engine</text>
+    <text x="430" y="558" text-anchor="middle" font-size="9" fill="#777">founder ↔ talent ↔ capital matching</text>
+
+    <rect x="600" y="518" width="220" height="56" rx="8" fill="#eef2f7" stroke="#b8c4d0"/>
+    <text x="710" y="540" text-anchor="middle" font-weight="600">Fund OS Dashboard</text>
+    <text x="710" y="558" text-anchor="middle" font-size="9" fill="#777">flywheel metrics for partners &amp; LPs</text>
+  </g>
+
+  <!-- feedback loop -->
+  <path d="M 150 574 C 150 630, 780 630, 800 112" fill="none" stroke="#8a8a8a" stroke-width="1.1" stroke-dasharray="5 4" marker-end="url(#arrow)"/>
+  <text x="430" y="644" text-anchor="middle" font-size="9" fill="#777" font-style="italic">feedback loop: intros &amp; radar actions generate new emails / meetings / RSVPs → re-captured upstream</text>
+</svg>

@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Fund OS — Prototype Suite</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=IBM+Plex+Mono:wght@400;500&family=Inter:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{--ink:#0f1512;--panel:#161e1a;--panel-2:#1c2620;--line:#26332c;--text:#e8ece9;--text-dim:#8fa198;--text-faint:#5c6b63;--signal:#e8a33d;--signal-dim:#8a6526;--up:#7fbf9e;--cold:#5f8ba8;--mono:'IBM Plex Mono',monospace;--disp:'Space Grotesk',sans-serif}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--ink);color:var(--text);font-family:'Inter',system-ui,sans-serif;font-size:14px;line-height:1.55;padding:60px 24px 80px;-webkit-font-smoothing:antialiased}
+.wrap{max-width:920px;margin:0 auto}
+.brand{display:flex;align-items:center;gap:10px;font-family:var(--disp);font-weight:700;font-size:15px;margin-bottom:34px}
+.brand .dot{width:9px;height:9px;border-radius:50%;background:var(--signal);box-shadow:0 0 12px var(--signal)}
+h1{font-family:var(--disp);font-size:34px;font-weight:600;letter-spacing:-.015em;line-height:1.15}
+.sub{color:var(--text-dim);margin:12px 0 40px;max-width:600px;font-size:14.5px}
+.sub em{color:var(--signal);font-style:normal}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+a.tile{display:block;background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:20px 22px;text-decoration:none;color:var(--text);transition:border-color .18s,transform .18s}
+a.tile:hover{border-color:var(--signal-dim);transform:translateY(-2px)}
+.tile .k{font-family:var(--mono);font-size:10px;letter-spacing:.13em;text-transform:uppercase;color:var(--signal);margin-bottom:8px}
+.tile h2{font-family:var(--disp);font-size:17px;font-weight:600;margin-bottom:6px}
+.tile p{color:var(--text-dim);font-size:12.5px;line-height:1.5}
+.tile .screens{font-family:var(--mono);font-size:10px;color:var(--text-faint);margin-top:12px}
+.wide{grid-column:1/-1}
+footer{margin-top:44px;font-family:var(--mono);font-size:10.5px;color:var(--text-faint);line-height:1.9}
+footer b{color:var(--text-dim);font-weight:500}
+@media(max-width:700px){.grid{grid-template-columns:1fr}body{padding:36px 16px 60px}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="brand"><span class="dot"></span>FUND OS · SIGNAL DESK</div>
+  <h1>The events business,<br>run as a data business.</h1>
+  <p class="sub">Seven modules for an early-stage fund: capture everything, <em>change no workflows</em>, and turn online + offline community into proprietary sourcing, formation, and nurturing loops.</p>
+  <div class="grid">
+    <a class="tile wide" href="prototypes/fund-os-prototype.html">
+      <div class="k">Core · 5 screens</div>
+      <h2>Fund OS — Radar · Graph · RFS · Intros · Flywheel</h2>
+      <p>The original loop: signal-derived sourcing, one identity spine, thesis portfolio with kill criteria, value-before-investment intros, and the LP-legible dashboard.</p>
+      <div class="screens">radar · ecosystem graph · rfs console · intro engine · flywheel</div>
+    </a>
+    <a class="tile" href="prototypes/fund-os-4x2-prototype.html">
+      <div class="k">Deep dive · 4 modules × 2 screens</div>
+      <h2>VC-native CDP → Ecosystem</h2>
+      <p>Why this isn't Segment, identity resolution with confidence merging, behavioral cohort targeting, GP-inbox outreach, journey stages, value ledger, and online/offline ecosystem ops.</p>
+      <div class="screens">capture console · resolution · cohorts · orchestrator · journeys · ledger · online · offline</div>
+    </a>
+    <a class="tile" href="prototypes/formation-readiness-profiler.html">
+      <div class="k">Module 06 · interactive</div>
+      <h2>Formation Readiness Profiler</h2>
+      <p>Ten unintuitive skills scored from interaction exhaust. Three candidates, three shapes, three different decisions: invest, pair, hold.</p>
+      <div class="screens">10-axis constellation · evidence traces · cluster analysis</div>
+    </a>
+    <a class="tile wide" href="prototypes/fund-os-expansion.html">
+      <div class="k">Expansion · modules 5–7</div>
+      <h2>LP Console · Portfolio Telemetry · Graph Copilot</h2>
+      <p>LP-as-product with auto-drafted quarterly letters and co-invest matching; post-investment health inferred from exhaust with a help router; and a natural-language console over the whole graph where every answer cites its pipes.</p>
+      <div class="screens">lp-as-product · post-investment · ask the graph</div>
+    </a>
+    <a class="tile wide" href="assets/vc-shadow-data-layer-architecture.svg">
+      <div class="k">Architecture</div>
+      <h2>Shadow Data Layer — block diagram</h2>
+      <p>Six layers: existing surfaces → ingestion → append-only log → identity resolution → ecosystem graph → products, with the feedback loop closed.</p>
+    </a>
+  </div>
+  <footer>
+    <b>Design principles</b> · capture at the infrastructure layer, never the behavior layer · push data entry down the power gradient · latency is signal · instrument the venue, not the guest · metadata by default, content by policy · the moat is that it still feels like a dinner
+  </footer>
+</div>
+</body>
+</html>

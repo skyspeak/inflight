@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Formation Readiness — Signal Desk</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#0f1512;--panel:#161e1a;--panel-2:#1c2620;--line:#26332c;
+  --text:#e8ece9;--text-dim:#8fa198;--text-faint:#5c6b63;
+  --signal:#e8a33d;--signal-dim:#8a6526;
+  --up:#7fbf9e;--down:#d47b6a;--cold:#5f8ba8;
+  --mono:'IBM Plex Mono',ui-monospace,monospace;
+  --disp:'Space Grotesk',sans-serif;--body:'Inter',system-ui,sans-serif;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--ink);color:var(--text);font-family:var(--body);font-size:14px;line-height:1.5;-webkit-font-smoothing:antialiased;padding:34px 24px 70px}
+.wrap{max-width:1160px;margin:0 auto}
+.eyebrow{font-family:var(--mono);font-size:10.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--signal);margin-bottom:7px}
+h1{font-family:var(--disp);font-size:30px;font-weight:600;letter-spacing:-.015em}
+.sub{color:var(--text-dim);font-size:13.5px;margin:6px 0 24px;max-width:600px}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:12px}
+.badge{font-family:var(--mono);font-size:10px;letter-spacing:.05em;padding:2px 8px;border-radius:5px;border:1px solid var(--line);color:var(--text-dim);white-space:nowrap}
+.badge.amber{color:var(--signal);border-color:var(--signal-dim)}
+.badge.sage{color:var(--up);border-color:#3c5c4c}
+.badge.clay{color:var(--down);border-color:#6a4038}
+
+/* candidate switcher */
+.switcher{display:flex;gap:10px;margin-bottom:18px;flex-wrap:wrap}
+.cand{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:11px 16px;display:flex;gap:11px;align-items:center;cursor:pointer;transition:border-color .2s;font-family:inherit;color:var(--text);text-align:left}
+.cand:hover{border-color:var(--signal-dim)}
+.cand.active{border-color:var(--signal)}
+.cand:focus-visible{outline:2px solid var(--signal);outline-offset:2px}
+.cand .av{width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,var(--signal-dim),var(--panel-2));display:flex;align-items:center;justify-content:center;font-family:var(--disp);font-weight:600;font-size:13px;color:var(--signal);flex-shrink:0}
+.cand .nm{font-weight:600;font-size:13.5px}
+.cand .rl{font-size:11px;color:var(--text-dim)}
+
+/* layout */
+.layout{display:grid;grid-template-columns:490px 1fr;gap:16px;align-items:start}
+.chart-card{padding:22px 18px 14px;text-align:center}
+.score-line{display:flex;justify-content:center;align-items:baseline;gap:10px;margin-bottom:4px}
+.big{font-family:var(--disp);font-size:44px;font-weight:700;letter-spacing:-.02em;color:var(--signal)}
+.big small{font-size:16px;color:var(--text-faint);font-weight:500}
+.verdict{font-family:var(--mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;margin-bottom:10px}
+svg text{font-family:var(--mono)}
+.axis-label{fill:var(--text-dim);font-size:9.5px;cursor:pointer;transition:fill .15s}
+.axis-label:hover,.axis-label.hot{fill:var(--signal)}
+.legend{display:flex;justify-content:center;gap:18px;font-family:var(--mono);font-size:10px;color:var(--text-faint);padding-top:10px;border-top:1px solid var(--line);margin-top:8px}
+.legend i{display:inline-block;width:10px;height:3px;border-radius:2px;vertical-align:middle;margin-right:6px}
+
+/* right column */
+.clusters{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-bottom:14px}
+.cluster{padding:13px 15px}
+.cluster h4{font-family:var(--mono);font-size:9.5px;letter-spacing:.11em;text-transform:uppercase;color:var(--text-faint);margin-bottom:4px}
+.cluster .cv{font-family:var(--disp);font-size:21px;font-weight:600}
+.cluster .track{height:4px;background:var(--line);border-radius:2px;margin-top:7px;overflow:hidden}
+.cluster .track i{display:block;height:100%;border-radius:2px;background:var(--signal);transition:width .7s cubic-bezier(.2,.8,.2,1)}
+.rec{padding:16px 18px;margin-bottom:14px;border-left:3px solid var(--signal)}
+.rec h3{font-family:var(--disp);font-size:15px;font-weight:600;margin-bottom:5px}
+.rec p{font-size:12.5px;color:var(--text-dim);line-height:1.55}
+.rec p em{color:var(--text);font-style:normal}
+.evidence{padding:4px 0}
+.evidence h3{font-family:var(--mono);font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--text-faint);padding:13px 18px 9px}
+.ev-item{display:grid;grid-template-columns:22px 1fr auto;gap:11px;padding:10px 18px;border-top:1px solid var(--line);font-size:12.5px;align-items:start}
+.ev-item .n{font-family:var(--mono);font-size:11px;color:var(--signal);padding-top:1px}
+.ev-item .m{color:var(--text-dim);font-size:11px;margin-top:2px}
+.ev-item .src{font-family:var(--mono);font-size:9.5px;color:var(--cold);padding-top:3px}
+.ev-item.dim .n{color:var(--text-faint)}
+footer{margin-top:22px;font-family:var(--mono);font-size:10.5px;color:var(--text-faint);text-align:center;line-height:1.8}
+footer b{color:var(--text-dim);font-weight:500}
+@media(max-width:920px){.layout{grid-template-columns:1fr}.chart-card svg{width:100%;height:auto}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="eyebrow">Signal desk · module 06</div>
+  <h1>Formation Readiness</h1>
+  <p class="sub">Ten skills résumés can't hold, scored from interaction exhaust. The shape predicts what to do — invest, intervene, or pair.</p>
+
+  <div class="switcher" role="tablist" aria-label="Candidates">
+    <button class="cand active" data-c="0" role="tab" aria-selected="true"><span class="av">PR</span><span><span class="nm">Priya Raghavan</span><br><span class="rl">ex-Stripe · stealth</span></span></button>
+    <button class="cand" data-c="1" role="tab" aria-selected="false"><span class="av">DK</span><span><span class="nm">Dana Kimura</span><br><span class="rl">ex-Hyland · exploring</span></span></button>
+    <button class="cand" data-c="2" role="tab" aria-selected="false"><span class="av">JW</span><span><span class="nm">Jordan Wells</span><br><span class="rl">2× operator · loud</span></span></button>
+  </div>
+
+  <div class="layout">
+    <!-- ══ chart ══ -->
+    <div class="card chart-card">
+      <div class="score-line"><span class="big" id="score">86<small>/100</small></span></div>
+      <div class="verdict" id="verdict" style="color:var(--up)">invest-grade shape</div>
+      <svg id="radar" viewBox="0 0 460 430" width="454" height="424" aria-label="Ten-skill radar chart">
+        <g id="rings"></g>
+        <g id="spokes"></g>
+        <polygon id="ghost" fill="none" stroke="var(--text-faint)" stroke-width="1" stroke-dasharray="3 4" opacity=".5"/>
+        <polygon id="shape" fill="rgba(232,163,61,.13)" stroke="var(--signal)" stroke-width="2" style="transition:all .7s cubic-bezier(.2,.8,.2,1)"/>
+        <g id="dots"></g>
+        <g id="labels"></g>
+      </svg>
+      <div class="legend">
+        <span><i style="background:var(--signal)"></i>candidate</span>
+        <span><i style="background:var(--text-faint)"></i>funded-founder median</span>
+      </div>
+    </div>
+
+    <!-- ══ analysis ══ -->
+    <div>
+      <div class="clusters" id="clusters"></div>
+      <div class="card rec" id="rec"></div>
+      <div class="card evidence">
+        <h3>Strongest traces · auto-captured</h3>
+        <div id="evlist"></div>
+      </div>
+    </div>
+  </div>
+
+  <footer>
+    skills: <b>01</b> underestimated comfortably · <b>02</b> unembarrassed questions · <b>03</b> scheduling gravity · <b>04</b> documentation compulsion · <b>05</b> vendor negotiation<br>
+    <b>06</b> cold-thread revival · <b>07</b> precise disagreement · <b>08</b> boredom tolerance · <b>09</b> teaching w/o credential · <b>10</b> rejection metabolism
+  </footer>
+</div>
+
+<script>
+const SKILLS=["01 underestimated","02 questions","03 sched gravity","04 documentation","05 vendor nego","06 thread revival","07 disagreement","08 boredom tol","09 teaching","10 rejection met"];
+const MEDIAN=[55,60,58,52,50,54,57,50,56,58];
+
+const CANDS=[
+ {name:"Priya Raghavan",score:86,verdict:"invest-grade shape",vcolor:"var(--up)",
+  vals:[88,92,84,71,63,79,90,85,74,93],
+  clusters:[["Information advantage",88],["Human gravity",79],["Execution durability",76],["Conviction integrity",90]],
+  rec:{h:"Recommendation: lead the pre-seed, now",
+       p:"Rare full shape — spiky where it matters (<em>questions, disagreement, rejection metabolism</em>) with no cluster below 75. The 18-day-old incorporation plus this profile means the pre-pitch window is closing. Weakest edge is vendor negotiation: pair her with a fractional-CFO design partner rather than waiting for it to develop."},
+  ev:[
+   {n:"10",t:"Re-engaged J. Park 26 hours after a passed deal in 2024 — with a sharper wedge",m:"gap between decline email and next constructive thread: 1.1 days (cohort median: 40 days)",s:"gmail-meta"},
+   {n:"02",t:"Asked 9 questions in a room of payments VPs at Fintech Infra Dinner",m:"question-to-statement ratio 3.2 in transcript; highest in cohort",s:"granola"},
+   {n:"07",t:"Pushed back on a GP's marketplace thesis — warmth score unchanged after",m:"disagreement flagged in salon transcript; relationship edge stayed at 78",s:"transcript+graph"},
+   {n:"03",t:"Three senior operators rescheduled to meet her, not the reverse",m:"inbound reschedule flow +3 / outbound 0 over 60 days",s:"gcal"}]},
+
+ {name:"Dana Kimura",score:71,verdict:"pair-to-complete",vcolor:"var(--signal)",
+  vals:[62,58,55,90,88,60,52,94,68,72],
+  clusters:[["Information advantage",70],["Human gravity",61],["Execution durability",84],["Conviction integrity",52]],
+  rec:{h:"Recommendation: don't fund solo — pair with a wedge-finder",
+       p:"Classic durability-heavy shape: <em>documentation, vendor negotiation, boredom tolerance</em> all 88+. Ten years in records management is the moat nobody wants — and low disagreement (52) means the wedge will get averaged into consensus if she ideates alone. Match her with a high-#1/#7 profile (Ale Fontán scores 89/86) and route both into RFS-02. This is company <em>formation</em>, not selection."},
+  ev:[
+   {n:"08",t:"Engaged with records-retention threads across 5 consecutive quarters",m:"longest single-vertical engagement streak in graph; zero topic drift",s:"slack+luma"},
+   {n:"04",t:"Sends structured recap notes after every meeting, unprompted",m:"11 of last 11 meetings followed by outbound doc within 24h",s:"gmail-meta"},
+   {n:"05",t:"Renegotiated her team's Documentum contract, referenced twice at salons",m:"vendor-cost fluency flagged in 2 transcripts",s:"granola"},
+   {n:"07",t:"Deferred to senior opinion in 4 of 4 tracked disagreements",m:"weak trace — the gap the pairing must cover",s:"transcript",dim:true}]},
+
+ {name:"Jordan Wells",score:54,verdict:"charisma without traces",vcolor:"var(--down)",
+  vals:[22,38,72,30,35,44,48,25,81,31],
+  clusters:[["Information advantage",28],["Human gravity",66],["Execution durability",32],["Conviction integrity",48]],
+  rec:{h:"Recommendation: hold — the résumé outruns the exhaust",
+       p:"This is what priced-in looks like: strong stage presence (<em>teaching 81, scheduling gravity 72</em>) but the durability cluster collapses at 32 and rejection metabolism is 31 — after our pass in March, next outreach took 11 weeks. Every fund sees the charisma; only the graph sees the gaps. Keep in community, revisit if #10 and #8 traces improve. Passing on loud is where this system earns its keep."},
+  ev:[
+   {n:"09",t:"Keynoted two salons; explanations re-shared 14 times in community",m:"strongest distribution instinct in cohort — real, but already visible to everyone",s:"slack"},
+   {n:"10",t:"11-week silence after March pass, then a generic re-pitch",m:"rejection re-engagement in weeks, not hours; no wedge evolution",s:"gmail-meta",dim:true},
+   {n:"08",t:"Touched 6 different verticals in 6 months",m:"no sustained engagement streak; boredom tolerance trace absent",s:"luma+slack",dim:true},
+   {n:"04",t:"Zero unprompted follow-up docs across 9 tracked meetings",m:"durability cluster unsupported",s:"gmail-meta",dim:true}]}
+];
+
+const CX=230,CY=210,R=158,N=10;
+function pt(i,frac){const a=-Math.PI/2+i*2*Math.PI/N;return[CX+Math.cos(a)*R*frac,CY+Math.sin(a)*R*frac];}
+function poly(vals){return vals.map((v,i)=>pt(i,v/100).join(',')).join(' ');}
+
+// build static chart chrome
+const rings=document.getElementById('rings'),spokes=document.getElementById('spokes'),labels=document.getElementById('labels');
+[.25,.5,.75,1].forEach(f=>{
+  const p=document.createElementNS('http://www.w3.org/2000/svg','polygon');
+  p.setAttribute('points',Array.from({length:N},(_,i)=>pt(i,f).join(',')).join(' '));
+  p.setAttribute('fill','none');p.setAttribute('stroke','var(--line)');p.setAttribute('stroke-width','1');
+  rings.appendChild(p);
+});
+for(let i=0;i<N;i++){
+  const [x,y]=pt(i,1);
+  const l=document.createElementNS('http://www.w3.org/2000/svg','line');
+  l.setAttribute('x1',CX);l.setAttribute('y1',CY);l.setAttribute('x2',x);l.setAttribute('y2',y);
+  l.setAttribute('stroke','var(--line)');l.setAttribute('stroke-width','1');
+  spokes.appendChild(l);
+  const [lx,ly]=pt(i,1.16);
+  const t=document.createElementNS('http://www.w3.org/2000/svg','text');
+  t.setAttribute('x',lx);t.setAttribute('y',ly+3);
+  t.setAttribute('text-anchor',lx<CX-8?'end':lx>CX+8?'start':'middle');
+  t.setAttribute('class','axis-label');t.textContent=SKILLS[i];
+  labels.appendChild(t);
+}
+document.getElementById('ghost').setAttribute('points',poly(MEDIAN));
+
+const dots=document.getElementById('dots');
+function render(c){
+  document.getElementById('shape').setAttribute('points',poly(c.vals));
+  dots.innerHTML='';
+  c.vals.forEach((v,i)=>{
+    const [x,y]=pt(i,v/100);
+    const d=document.createElementNS('http://www.w3.org/2000/svg','circle');
+    d.setAttribute('cx',x);d.setAttribute('cy',y);d.setAttribute('r',3.5);
+    d.setAttribute('fill',v>=75?'var(--signal)':v>=45?'var(--panel-2)':'var(--ink)');
+    d.setAttribute('stroke',v>=75?'var(--signal)':v>=45?'var(--signal-dim)':'var(--down)');
+    d.setAttribute('stroke-width','1.5');
+    dots.appendChild(d);
+  });
+  document.getElementById('score').innerHTML=c.score+'<small>/100</small>';
+  const v=document.getElementById('verdict');v.textContent=c.verdict;v.style.color=c.vcolor;
+  document.getElementById('clusters').innerHTML=c.clusters.map(([n,s])=>
+    `<div class="card cluster"><h4>${n}</h4><div class="cv">${s}</div><div class="track"><i style="width:${s}%"></i></div></div>`).join('');
+  document.getElementById('rec').innerHTML=`<h3>${c.rec.h}</h3><p>${c.rec.p}</p>`;
+  document.getElementById('evlist').innerHTML=c.ev.map(e=>
+    `<div class="ev-item${e.dim?' dim':''}"><span class="n">#${e.n}</span><span>${e.t}<div class="m">${e.m}</div></span><span class="src">${e.s}</span></div>`).join('');
+}
+render(CANDS[0]);
+
+document.querySelectorAll('.cand').forEach(b=>b.addEventListener('click',()=>{
+  document.querySelectorAll('.cand').forEach(x=>{x.classList.remove('active');x.setAttribute('aria-selected','false')});
+  b.classList.add('active');b.setAttribute('aria-selected','true');
+  render(CANDS[+b.dataset.c]);
+}));
+</script>
+</body>
+</html>

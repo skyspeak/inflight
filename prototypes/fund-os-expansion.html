@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Fund OS — Expansion Modules</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#0f1512;--panel:#161e1a;--panel-2:#1c2620;--line:#26332c;
+  --text:#e8ece9;--text-dim:#8fa198;--text-faint:#5c6b63;
+  --signal:#e8a33d;--signal-dim:#8a6526;
+  --up:#7fbf9e;--down:#d47b6a;--cold:#5f8ba8;
+  --mono:'IBM Plex Mono',ui-monospace,monospace;
+  --disp:'Space Grotesk',sans-serif;--body:'Inter',system-ui,sans-serif;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--ink);color:var(--text);font-family:var(--body);font-size:14px;line-height:1.5;-webkit-font-smoothing:antialiased}
+button{font-family:inherit;cursor:pointer}
+.shell{display:flex;min-height:100vh}
+.nav{width:212px;flex-shrink:0;border-right:1px solid var(--line);padding:22px 12px;position:sticky;top:0;height:100vh}
+.brand{font-family:var(--disp);font-weight:700;font-size:16px;padding:0 10px 16px;display:flex;align-items:center;gap:9px}
+.brand .dot{width:9px;height:9px;border-radius:50%;background:var(--signal);box-shadow:0 0 10px var(--signal)}
+.mod{font-family:var(--mono);font-size:9.5px;letter-spacing:.13em;text-transform:uppercase;color:var(--text-faint);padding:14px 10px 5px}
+.nav button.tab{display:block;width:100%;text-align:left;background:none;border:none;color:var(--text-dim);padding:8px 10px;border-radius:8px;font-size:13px;font-weight:500}
+.nav button.tab:hover{background:var(--panel);color:var(--text)}
+.nav button.tab.active{background:var(--panel-2);color:var(--signal)}
+.main{flex:1;padding:26px 32px 60px;max-width:1150px}
+.screen{display:none}
+.screen.active{display:block;animation:fade .22s ease}
+@keyframes fade{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
+.eyebrow{font-family:var(--mono);font-size:10.5px;letter-spacing:.15em;text-transform:uppercase;color:var(--signal);margin-bottom:6px}
+h1{font-family:var(--disp);font-size:24px;font-weight:600;margin-bottom:4px}
+.sub{color:var(--text-dim);font-size:13px;margin-bottom:20px;max-width:680px}
+.sub em{color:var(--text);font-style:normal}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:11px}
+.badge{font-family:var(--mono);font-size:10px;padding:2px 7px;border-radius:5px;border:1px solid var(--line);color:var(--text-dim);white-space:nowrap}
+.badge.amber{color:var(--signal);border-color:var(--signal-dim)}
+.badge.sage{color:var(--up);border-color:#3c5c4c}
+.badge.blue{color:var(--cold);border-color:#37536a}
+.badge.clay{color:var(--down);border-color:#6a4038}
+.num{font-family:var(--mono)}
+.btn{background:var(--panel-2);border:1px solid var(--line);color:var(--text);border-radius:8px;padding:6px 13px;font-size:12px;font-weight:500}
+.btn:hover{border-color:var(--signal-dim)}
+.btn.primary{background:var(--signal);border-color:var(--signal);color:#1a1408;font-weight:600}
+.sec-h{font-family:var(--mono);font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--text-faint);padding:13px 16px 9px}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:14px;align-items:start}
+.row{display:grid;gap:12px;padding:11px 16px;border-top:1px solid var(--line);font-size:12.5px;align-items:center}
+.row .m{color:var(--text-dim);font-size:11px;margin-top:2px;line-height:1.45}
+.row .m em{color:var(--signal);font-style:normal}
+.kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:14px}
+.kpi{padding:14px 16px}
+.kpi .label{font-family:var(--mono);font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--text-faint);margin-bottom:6px}
+.kpi .value{font-family:var(--disp);font-size:24px;font-weight:600}
+.kpi .d{font-family:var(--mono);font-size:10.5px;margin-top:2px}
+.d.up{color:var(--up)}.d.down{color:var(--down)}
+
+/* copilot */
+.chat{padding:16px}
+.q{background:var(--panel-2);border:1px solid var(--line);border-radius:10px 10px 10px 3px;padding:10px 14px;font-size:13px;max-width:78%;margin-bottom:12px}
+.a{border-left:3px solid var(--signal);padding:2px 0 2px 14px;margin:0 0 16px 8px;font-size:13px;line-height:1.6}
+.a .cite{font-family:var(--mono);font-size:9.5px;color:var(--cold);background:var(--panel-2);border:1px solid var(--line);border-radius:4px;padding:1px 5px;margin:0 2px;white-space:nowrap}
+.a em{color:var(--signal);font-style:normal}
+.inputbar{display:flex;gap:8px;padding:12px 16px;border-top:1px solid var(--line)}
+.inputbar input{flex:1;background:var(--panel-2);border:1px solid var(--line);border-radius:8px;color:var(--text);padding:9px 13px;font-family:inherit;font-size:13px}
+.inputbar input:focus{outline:none;border-color:var(--signal-dim)}
+.sugg{display:flex;gap:7px;flex-wrap:wrap;padding:0 16px 14px}
+.sugg button{font-family:var(--mono);font-size:10.5px;background:none;border:1px solid var(--line);color:var(--text-dim);border-radius:14px;padding:4px 11px}
+.sugg button:hover{border-color:var(--signal-dim);color:var(--signal)}
+
+/* portfolio */
+.pc{grid-template-columns:1fr 110px 110px auto}
+.spark{display:flex;align-items:flex-end;gap:2px;height:22px}
+.spark i{width:5px;border-radius:1px;background:var(--signal-dim)}
+.spark i.hot{background:var(--signal)}
+.spark.down i{background:#6a4038}.spark.down i.hot{background:var(--down)}
+</style>
+</head>
+<body>
+<div class="shell">
+<nav class="nav" aria-label="Modules">
+  <div class="brand"><span class="dot"></span>Fund OS +</div>
+  <div class="mod">5 · LP Console</div>
+  <button class="tab active" data-s="lp">LP-as-Product</button>
+  <div class="mod">6 · Portfolio Telemetry</div>
+  <button class="tab" data-s="pf">Post-Investment</button>
+  <div class="mod">7 · Graph Copilot</div>
+  <button class="tab" data-s="gc">Ask the Graph</button>
+</nav>
+<main class="main">
+
+<!-- ════ 5 LP CONSOLE ════ -->
+<section class="screen active" id="lp">
+  <div class="eyebrow">Module 5 · LP Console</div>
+  <h1>LP-as-Product</h1>
+  <p class="sub">LPs are the fund's other customer — nurture them with the same graph. Quarterly letters generated from flywheel data, co-invest matched to stated appetite, and ecosystem access as a retention feature. <em>Fundraise II starts the day Fund I closes.</em></p>
+  <div class="kpis">
+    <div class="card kpi"><div class="label">LP NPS</div><div class="value">74</div><div class="d up">▲ 9 since portal launch</div></div>
+    <div class="card kpi"><div class="label">Co-invest take-rate</div><div class="value">61%</div><div class="d up">offers accepted</div></div>
+    <div class="card kpi"><div class="label">LPs active in ecosystem</div><div class="value">18/31</div><div class="d up">events or intros 90d</div></div>
+    <div class="card kpi"><div class="label">Re-up intent (soft)</div><div class="value" style="color:var(--signal)">83%</div><div class="d up">from annual pulse</div></div>
+  </div>
+  <div class="two">
+    <div class="card">
+      <div class="sec-h">Co-invest matching · appetite × live deals</div>
+      <div class="row" style="grid-template-columns:1fr auto auto"><span><b>Meridian Pay</b> pre-seed · $400K allocation open<div class="m">matched: 3 LPs with fintech-infra appetite · <em>Halston FO viewed data room 4× this week</em></div></span><span class="badge amber">closing</span><button class="btn primary">Send offers</button></div>
+      <div class="row" style="grid-template-columns:1fr auto auto"><span><b>RFS-02 formation</b> (Kimura/Fontán) · SPV forming<div class="m">2 LPs asked for "AI × compliance" exposure in pulse survey — pre-matched</div></span><span class="badge blue">forming</span><button class="btn">Draft note</button></div>
+      <div class="row" style="grid-template-columns:1fr auto auto"><span><b>Corporate LP ↔ portfolio</b> · Nexum Insurance<div class="m">their procurement pain matched to 2 portcos → <em>LP becomes design partner</em></div></span><span class="badge sage">value loop</span><button class="btn">Intro</button></div>
+    </div>
+    <div class="card">
+      <div class="sec-h">Q2 letter · auto-drafted from flywheel, GP-edited</div>
+      <div class="row" style="grid-template-columns:1fr"><span style="font-size:12.5px;line-height:1.65;color:var(--text-dim)">"…67% of new investments this quarter were sourced <em>before the founder began raising</em>, up from 41%. Our events produced 380 new relationship edges and two of the quarter's three term sheets trace directly to salon seating decisions. One thesis (creator-economy fintech) was retired on pre-registered criteria — the memo is attached…"<div class="m" style="margin-top:8px">every claim links to a dashboard number · <em>LP trust = auditability</em></div></span></div>
+      <div class="row" style="grid-template-columns:1fr auto auto"><span>Draft status<div class="m">14 min generation · 2 GP edits pending</div></span><span class="badge amber">review</span><button class="btn primary">Open draft</button></div>
+    </div>
+  </div>
+</section>
+
+<!-- ════ 6 PORTFOLIO TELEMETRY ════ -->
+<section class="screen" id="pf">
+  <div class="eyebrow">Module 6 · Portfolio Telemetry</div>
+  <h1>Post-Investment</h1>
+  <p class="sub">Same shadow-data philosophy after the wire: no founder dashboards to fill, no update templates. Health read from exhaust founders already emit — and the fund's help routed where signals dip. <em>The update email is dead; the pipes replaced it.</em></p>
+  <div class="card">
+    <div class="sec-h">Portfolio health · inferred, not reported</div>
+    <div class="row pc"><span><b>Meridian Pay</b><div class="m">hiring velocity ↑ (3 offers out) · GitHub commit cadence steady · <em>zero asks in 6 wks — too quiet, nudge scheduled</em></div></span><div class="spark"><i style="height:8px"></i><i style="height:11px"></i><i style="height:10px"></i><i style="height:14px"></i><i style="height:16px"></i><i class="hot" style="height:20px"></i></div><span class="badge sage">healthy</span><button class="btn">Open</button></div>
+    <div class="row pc"><span><b>Clauswork</b> (RFS-02 graduate)<div class="m">2 design-partner pilots live · founder attended 0 events in 60d — <em>heads-down, expected at this stage</em></div></span><div class="spark"><i style="height:6px"></i><i style="height:9px"></i><i style="height:12px"></i><i style="height:12px"></i><i class="hot" style="height:15px"></i><i class="hot" style="height:17px"></i></div><span class="badge sage">healthy</span><button class="btn">Open</button></div>
+    <div class="row pc"><span><b>Northbeam Health</b><div class="m">key eng candidate declined (talent pipe) · domain traffic flat 8 wks · founder reply latency 3× — <em>three weak signals = one strong one</em></div></span><div class="spark down"><i style="height:16px"></i><i style="height:14px"></i><i style="height:11px"></i><i style="height:9px"></i><i class="hot" style="height:7px"></i><i class="hot" style="height:5px"></i></div><span class="badge clay">intervene</span><button class="btn primary">Plan help</button></div>
+  </div>
+  <div class="two" style="margin-top:14px">
+    <div class="card">
+      <div class="sec-h">Help router · fund resources → dipping signals</div>
+      <div class="row" style="grid-template-columns:1fr auto"><span><b>Northbeam</b> ← 2 senior eng from talent bench<div class="m">both ex-healthtech, both in graph 6+ months, warm</div></span><button class="btn primary">Route</button></div>
+      <div class="row" style="grid-template-columns:1fr auto"><span><b>Meridian</b> ← customer intro: Nexum Insurance (LP)<div class="m">closes the LP value loop from module 5</div></span><button class="btn">Route</button></div>
+      <div class="row" style="grid-template-columns:1fr auto"><span><b>Clauswork</b> ← seat at next AI × Compliance salon<div class="m">their pilot story = RFS-02 proof → attracts the next formation pair</div></span><button class="btn">Route</button></div>
+    </div>
+    <div class="card">
+      <div class="sec-h">Why founders tolerate this</div>
+      <div class="row" style="grid-template-columns:1fr"><span>Zero reporting burden — no monthly template, ever<div class="m">consent given once at investment; scope documented; founder sees their own telemetry too — <em>transparency is the deal</em></div></span></div>
+      <div class="row" style="grid-template-columns:1fr"><span>Help arrives before they ask<div class="m">median time from signal-dip to routed help: <em>6 days</em> · portfolio NPS on "fund helpfulness": 81</div></span></div>
+    </div>
+  </div>
+</section>
+
+<!-- ════ 7 GRAPH COPILOT ════ -->
+<section class="screen" id="gc">
+  <div class="eyebrow">Module 7 · Graph Copilot</div>
+  <h1>Ask the Graph</h1>
+  <p class="sub">Natural language over the whole spine — every answer cites its pipes, so partners can audit the reasoning. The Monday briefing writes itself; the follow-up questions are where the alpha is.</p>
+  <div class="card">
+    <div class="chat">
+      <div class="q">Who should we invite to the next fintech dinner that we've never invited before?</div>
+      <div class="a">Three candidates, ranked by expected edge-creation:<br><br>
+      <em>1. Yuki Tanaka</em> — cohort target, her reconciliation questions <span class="cite">slack #fintech</span> map to Tom Esposito's stated pain <span class="cite">granola 06-12</span>. Never invited; predicted acceptance high (opens 92% of community email <span class="cite">gmail-meta</span>).<br>
+      <em>2. Sam Okafor</em> — zero public signal, FR 77, strongest thread-revival trace in cohort <span class="cite">gmail-meta</span>. A dinner is the lowest-pressure first touch for a pre-idea profile.<br>
+      <em>3. Nexum Insurance VP Ops</em> — LP-adjacent operator whose procurement threads seeded RFS-04 <span class="cite">slack #ops</span>. Seat near a GP, not a founder — demand signal, not deal flow.</div>
+      <div class="q">Why did our event→meeting conversion dip in June?</div>
+      <div class="a">Two factors explain ~80% of the dip:<br><br>
+      The June 24 dinner skewed 40% net-new attendees <span class="cite">luma</span> — first-touch guests convert at 19% vs 51% for repeat attendees. Composition, not quality.<br>
+      GP follow-up latency doubled the same week <span class="cite">gcal</span> <span class="cite">gmail-meta</span> — coincides with J. Park's travel <span class="cite">navan</span>. The 72-hour window closed on 9 warm edges before outreach.<br><br>
+      <em>Suggested fix:</em> cap net-new mix at 25% and pre-draft follow-ups before travel weeks. Want this as a standing guardrail?</div>
+    </div>
+    <div class="sugg">
+      <button>Which RFS is closest to its kill criteria?</button>
+      <button>Draft Monday's radar briefing</button>
+      <button>Who have we neglected that we shouldn't have?</button>
+      <button>Which LP should meet Meridian?</button>
+    </div>
+    <div class="inputbar"><input placeholder="Ask the graph… (every answer cites its sources)" aria-label="Ask the graph"><button class="btn primary">Ask</button></div>
+  </div>
+</section>
+
+</main>
+</div>
+<script>
+const tabs=document.querySelectorAll('.tab'),screens=document.querySelectorAll('.screen');
+tabs.forEach(t=>t.addEventListener('click',()=>{
+  tabs.forEach(x=>x.classList.remove('active'));t.classList.add('active');
+  screens.forEach(s=>s.classList.toggle('active',s.id===t.dataset.s));
+}));
+</script>
+</body>
+</html>
