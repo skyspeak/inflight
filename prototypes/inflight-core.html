@@ -93,6 +93,23 @@ h1{font-family:var(--disp);font-size:26px;font-weight:600;letter-spacing:-.01em;
 .rscore .v{font-family:var(--mono);font-size:19px;font-weight:600;color:var(--signal)}
 .rscore .d{font-family:var(--mono);font-size:10.5px}
 .d.up{color:var(--up)}.d.down{color:var(--down)}
+.archetype-legend{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin-bottom:16px}
+.archetype-legend .arc{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:11px 12px;font-size:11px;line-height:1.45;color:var(--text-dim)}
+.archetype-legend .arc b{display:block;font-family:var(--mono);font-size:9px;letter-spacing:.08em;text-transform:uppercase;color:var(--text-faint);margin-bottom:4px}
+.archetype-legend .arc em{color:var(--text);font-style:normal;font-weight:500}
+.badge.arch-hipo{color:var(--cold);border-color:#37536a;background:rgba(95,139,168,.08)}
+.badge.arch-future{color:#a8c4d8;border-color:#4a6278;background:rgba(95,139,168,.12)}
+.badge.arch-stealth{color:var(--signal);border-color:var(--signal-dim)}
+.badge.arch-active{color:var(--up);border-color:#3c5c4c;background:rgba(127,191,158,.08)}
+.badge.arch-repeat{color:#d4b896;border-color:#7a6040;background:rgba(232,163,61,.06)}
+.radar-row.hidden{display:none}
+.archetype-box{border-left:3px solid var(--signal);padding:12px 14px;margin-bottom:0}
+.archetype-box .atitle{font-family:var(--disp);font-size:15px;font-weight:600;margin-bottom:4px}
+.archetype-box .aconf{font-family:var(--mono);font-size:10px;color:var(--text-faint);margin-bottom:8px}
+.archetype-box .arules{font-size:12px;color:var(--text-dim);line-height:1.55}
+.archetype-box .arules li{margin:4px 0 4px 16px}
+.archetype-box .anext{margin-top:10px;font-family:var(--mono);font-size:10.5px;color:var(--cold)}
+@media(max-width:900px){.archetype-legend{grid-template-columns:1fr 1fr}}
 
 /* ---------- graph / profile ---------- */
 .profile{display:grid;grid-template-columns:340px 1fr;gap:14px;align-items:start}
@@ -198,62 +215,100 @@ h1{font-family:var(--disp);font-size:26px;font-weight:600;letter-spacing:-.01em;
   <section class="screen active" id="radar">
     <div class="eyebrow">Weekly partner review · Mon 9:00</div>
     <h1>Sourcing Radar</h1>
-    <p class="sub">People surfacing before they raise. Ranked by composite signal across event behavior, network motion, and attention exhaust — every score explains itself.</p>
-    <div class="radar-toolbar" role="group" aria-label="Radar filters">
-      <button class="chip active">All signals</button>
-      <button class="chip">Talent flow</button>
-      <button class="chip">Event behavior</button>
-      <button class="chip">Attention</button>
-      <button class="chip">RFS-matched</button>
+    <p class="sub">People surfacing before they raise. Ranked by composite signal — then classified into founder archetypes from employment state, exit timing, and public exhaust.</p>
+    <div class="archetype-legend" aria-label="Founder archetype taxonomy">
+      <div class="arc"><b>Hipo AI/ML Talent</b><em>Employed.</em> Strong technical gravity, no founder trajectory — talent pipe, not sourcing.</div>
+      <div class="arc"><b>Future Founder</b><em>Employed.</em> Founder-shaped exhaust; likely starts something 1–2 jobs out.</div>
+      <div class="arc"><b>Stealth Founder</b><em>Just left.</em> No public company name yet — earliest formation window.</div>
+      <div class="arc"><b>Active Founder</b><em>Building in public.</em> Company exists, followers flocking, target zip code known.</div>
+      <div class="arc"><b>Repeat Founder</b><em>Prior company built.</em> Same as active — but not a first timer (YC alum, exit, etc.).</div>
     </div>
-    <div class="card">
-      <div class="radar-row">
+    <div class="radar-toolbar" role="group" aria-label="Archetype filters">
+      <button class="chip active" data-filter="all">All archetypes</button>
+      <button class="chip" data-filter="hipo">Hipo AI/ML</button>
+      <button class="chip" data-filter="future">Future Founder</button>
+      <button class="chip" data-filter="stealth">Stealth Founder</button>
+      <button class="chip" data-filter="active">Active Founder</button>
+      <button class="chip" data-filter="repeat">Repeat Founder</button>
+    </div>
+    <div class="card" id="radar-list">
+      <div class="radar-row" data-archetype="stealth">
         <div class="rank">01</div>
         <div>
-          <div class="rname">Priya Raghavan <span class="badge amber">stealth</span></div>
-          <div class="rwhy">Left Stripe (Staff Eng, ledgering) 3 wks ago · attended <em>3 of last 4 events</em> · new Delaware C-corp matched to her email domain · GP reply latency to her: <em>41 min</em> (p10)</div>
+          <div class="rname">Priya Raghavan <span class="badge arch-stealth">Stealth Founder</span></div>
+          <div class="rwhy">Left Stripe 3 wks ago · <em>no public launch</em> · Delaware C-corp + meridianpay.io domain matched · attended 3 of last 4 events · GP reply latency 41 min (p10)</div>
         </div>
         <div class="rsources"><span class="badge blue">luma</span><span class="badge blue">gmail</span><span class="badge blue">incorp</span><span class="badge blue">latency</span></div>
         <div class="rscore"><div class="v">94</div><div class="d up">▲ 12 this wk</div></div>
         <div class="sig s4" aria-label="signal strength 4 of 4"><i></i><i></i><i></i><i></i></div>
       </div>
-      <div class="radar-row">
+      <div class="radar-row" data-archetype="stealth">
         <div class="rank">02</div>
         <div>
-          <div class="rname">Marcus Oyelaran</div>
-          <div class="rwhy">Asked 2 unanswerable intro requests re: <em>clinical-ops staffing APIs</em> — whitespace flag · co-attended dinner with 2 design partners · GitHub activity spike on private org</div>
+          <div class="rname">Marcus Oyelaran <span class="badge arch-stealth">Stealth Founder</span></div>
+          <div class="rwhy">Exited Oscar Health 6 wks ago · <em>no incorporation record</em> · private GitHub org activity spike · 2 unanswerable intro requests re clinical-ops APIs</div>
         </div>
         <div class="rsources"><span class="badge blue">intro-req</span><span class="badge blue">luma</span><span class="badge blue">github</span></div>
         <div class="rscore"><div class="v">88</div><div class="d up">▲ 7</div></div>
         <div class="sig s4" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
       </div>
-      <div class="radar-row">
+      <div class="radar-row" data-archetype="repeat">
         <div class="rank">03</div>
         <div>
-          <div class="rname">Dana Kimura + Ale Fontán <span class="badge sage">RFS-02 match</span></div>
-          <div class="rwhy">Pair detected: both exited Hyland records-mgmt org within 30 days, <em>co-attended AI × Compliance salon</em>, 4 email threads with each other post-event (72-hr rule)</div>
+          <div class="rname">Maya Chen <span class="badge arch-repeat">Repeat Founder</span></div>
+          <div class="rwhy">YC S23 (did not raise follow-on) · building <em>Relaystack</em> — 2nd company · 4 ex-cofounders re-engaged in 30d · LinkedIn followers +340 since domain went live</div>
+        </div>
+        <div class="rsources"><span class="badge blue">yc</span><span class="badge blue">linkedin</span><span class="badge blue">co-email</span></div>
+        <div class="rscore"><div class="v">86</div><div class="d up">▲ 11</div></div>
+        <div class="sig s4" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
+      </div>
+      <div class="radar-row" data-archetype="active">
+        <div class="rank">04</div>
+        <div>
+          <div class="rname">Arjun Patel <span class="badge arch-active">Active Founder</span></div>
+          <div class="rwhy"><em>Northbeam Health</em> · company name public 4 mo · 3 design partners in graph · 2 eng candidates declined elsewhere to talk to him · GP dinner cadence accelerating</div>
+        </div>
+        <div class="rsources"><span class="badge blue">talent</span><span class="badge blue">gcal</span><span class="badge blue">expense</span></div>
+        <div class="rscore"><div class="v">82</div><div class="d up">▲ 6</div></div>
+        <div class="sig s3" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
+      </div>
+      <div class="radar-row" data-archetype="future">
+        <div class="rank">05</div>
+        <div>
+          <div class="rname">Elena Rostova <span class="badge arch-future">Future Founder</span></div>
+          <div class="rwhy"><em>Still at Stripe</em> (Treasury, 3rd payments role) · salon regular 6 mo · high FR traces but zero exit signal — classified 1–2 jobs out, not now</div>
+        </div>
+        <div class="rsources"><span class="badge blue">luma</span><span class="badge blue">slack</span><span class="badge blue">fr-score</span></div>
+        <div class="rscore"><div class="v">74</div><div class="d up">▲ 3</div></div>
+        <div class="sig s2" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
+      </div>
+      <div class="radar-row" data-archetype="hipo">
+        <div class="rank">06</div>
+        <div>
+          <div class="rname">Nina Kowalski <span class="badge arch-hipo">Hipo AI/ML Talent</span></div>
+          <div class="rwhy"><em>Staff Research Scientist @ Anthropic</em> · cited at 2 salons · teaching gravity 91 · zero exit/incorp/follower-cluster signals — talent pipe, not founder track</div>
+        </div>
+        <div class="rsources"><span class="badge blue">enrich</span><span class="badge blue">luma</span><span class="badge blue">gravity</span></div>
+        <div class="rscore"><div class="v">68</div><div class="d">— stable</div></div>
+        <div class="sig s2" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
+      </div>
+      <div class="radar-row" data-archetype="stealth">
+        <div class="rank">07</div>
+        <div>
+          <div class="rname">Dana Kimura + Ale Fontán <span class="badge arch-stealth">Stealth Founder</span> <span class="badge sage">pair</span></div>
+          <div class="rwhy">Both exited Hyland within 30d · <em>no company names</em> · co-attended AI × Compliance salon · 4 post-event email threads — formation pair, not solo</div>
         </div>
         <div class="rsources"><span class="badge blue">talent</span><span class="badge blue">luma</span><span class="badge blue">co-email</span></div>
         <div class="rscore"><div class="v">83</div><div class="d up">▲ 19</div></div>
         <div class="sig s3" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
       </div>
-      <div class="radar-row">
-        <div class="rank">04</div>
+      <div class="radar-row" data-archetype="repeat">
+        <div class="rank">08</div>
         <div>
-          <div class="rname">Sofia Andersen</div>
-          <div class="rwhy">GP expensed 2 dinners with her in 3 wks · calendar shows 3rd meeting booked <em>same-day</em> · no deck in inbox yet — pre-pitch window open</div>
+          <div class="rname">Rahul Mehta <span class="badge arch-repeat">Repeat Founder</span> <span class="badge clay">decaying</span></div>
+          <div class="rwhy">Prior exit (Soldo, 2021) · <em>2nd company likely raising elsewhere</em> · was #2 four weeks ago · reply latency up 6× · confirm or archive</div>
         </div>
-        <div class="rsources"><span class="badge blue">expense</span><span class="badge blue">gcal</span></div>
-        <div class="rscore"><div class="v">79</div><div class="d up">▲ 4</div></div>
-        <div class="sig s3" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
-      </div>
-      <div class="radar-row">
-        <div class="rank">05</div>
-        <div>
-          <div class="rname">Rahul Mehta <span class="badge clay">decaying</span></div>
-          <div class="rwhy">Was #2 four weeks ago · no event attendance since · reply latency up 6× · likely raising elsewhere — <em>confirm or archive</em></div>
-        </div>
-        <div class="rsources"><span class="badge blue">latency</span><span class="badge blue">luma</span></div>
+        <div class="rsources"><span class="badge blue">latency</span><span class="badge blue">luma</span><span class="badge blue">enrich</span></div>
         <div class="rscore"><div class="v">61</div><div class="d down">▼ 18</div></div>
         <div class="sig s2" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
       </div>
@@ -270,10 +325,22 @@ h1{font-family:var(--disp);font-size:26px;font-weight:600;letter-spacing:-.01em;
         <div class="p-head">
           <div class="avatar">PR</div>
           <div>
-            <div style="font-weight:600">Priya Raghavan</div>
+            <div style="font-weight:600">Priya Raghavan <span class="badge arch-stealth">Stealth Founder</span></div>
             <div style="font-size:12px;color:var(--text-dim)">ex-Stripe · Staff Eng, Ledgering</div>
           </div>
           <div class="sig s4" style="margin-left:auto" aria-label="signal 4 of 4"><i></i><i></i><i></i><i></i></div>
+        </div>
+        <div class="p-sec archetype-box">
+          <h3>Archetype classification</h3>
+          <div class="atitle">Stealth Founder</div>
+          <div class="aconf">confidence 0.91 · classified Jun 30 · rules engine v3</div>
+          <ul class="arules">
+            <li>Incumbent exit &lt; 90 days (Stripe → unemployed, Jun 3)</li>
+            <li>No public company announcement or press — domain exists but unmarketed</li>
+            <li>Incorporation matched to identity (Meridian Pay Inc, 18d) — early journey</li>
+            <li>Event + GP attention spike without follower cluster forming yet</li>
+          </ul>
+          <div class="anext">→ graduates to <b>Active Founder</b> when: public launch, press, or ≥3 inbound talent edges in 14d</div>
         </div>
         <div class="p-sec">
           <h3>Relationship warmth</h3>
@@ -467,9 +534,13 @@ document.addEventListener('keydown',e=>{
   if(map[e.key])show(map[e.key]);
 });
 function acceptIntro(id){document.getElementById(id).classList.add('accepted');}
-document.querySelectorAll('.chip').forEach(c=>c.addEventListener('click',()=>{
-  document.querySelectorAll('.chip').forEach(x=>x.classList.remove('active'));
+document.querySelectorAll('.chip[data-filter]').forEach(c=>c.addEventListener('click',()=>{
+  document.querySelectorAll('.chip[data-filter]').forEach(x=>x.classList.remove('active'));
   c.classList.add('active');
+  const f=c.dataset.filter;
+  document.querySelectorAll('#radar-list .radar-row').forEach(row=>{
+    row.classList.toggle('hidden',f!=='all'&&row.dataset.archetype!==f);
+  });
 }));
 </script>
 </body>

@@ -218,19 +218,19 @@ h1{font-family:var(--disp);font-size:24px;font-weight:600;letter-spacing:-.01em;
 <section class="screen" id="tgt1">
   <div class="eyebrow">Module 2 · Founder targeting</div>
   <h1>Cohort Builder</h1>
-  <p class="sub">Query the graph in behavior, not demographics. This cohort: <em>likely founders who haven't incorporated yet</em> — the formation window.</p>
+  <p class="sub">Query the graph in behavior, not demographics. This cohort: <em>Stealth + Future Founder archetypes</em> — employed or just-exited, pre-public company.</p>
   <div class="card">
     <div class="qbar">
-      <span class="qchip">exited payments incumbent &lt; 90d</span><span class="qchip op">AND</span>
-      <span class="qchip">events attended ≥ 2</span><span class="qchip op">AND</span>
-      <span class="qchip">no incorporation record</span><span class="qchip op">AND</span>
+      <span class="qchip">archetype ∈ {stealth, future}</span><span class="qchip op">AND</span>
+      <span class="qchip">exited incumbent &lt; 90d OR still employed + FR ≥ 70</span><span class="qchip op">AND</span>
+      <span class="qchip">no public company launch</span><span class="qchip op">AND</span>
       <span class="qchip">formation-readiness ≥ 70</span>
       <button class="btn" style="margin-left:auto">Save cohort</button>
     </div>
-    <div class="row tgt"><span><b>Priya Raghavan</b> <span class="badge amber">just incorporated — exiting cohort</span><div class="m">graduated to <em>active targeting</em> · 18 days from cohort-entry to incorporation</div></span><span class="badge blue">ex-Stripe ledgering</span><span class="num" style="color:var(--signal)">FR 86</span><button class="btn">Open</button></div>
-    <div class="row tgt"><span><b>Yuki Tanaka</b><div class="m">exited Adyen risk org · attended 2 salons · asked 3 reconciliation questions</div></span><span class="badge blue">ex-Adyen risk</span><span class="num" style="color:var(--signal)">FR 81</span><button class="btn">Open</button></div>
-    <div class="row tgt"><span><b>Sam Okafor</b><div class="m">exited Marqeta · high thread-revival trace · zero public signal — <em>nobody else sees this person</em></div></span><span class="badge blue">ex-Marqeta issuing</span><span class="num" style="color:var(--signal)">FR 77</span><button class="btn">Open</button></div>
-    <div class="row tgt"><span><b>Lena Vogel</b><div class="m">exited Stripe billing · 4 events · documentation-heavy shape → <em>pair candidate</em>, not solo</div></span><span class="badge blue">ex-Stripe billing</span><span class="num">FR 72</span><button class="btn">Open</button></div>
+    <div class="row tgt"><span><b>Priya Raghavan</b> <span class="badge amber">Stealth · graduating</span><div class="m">incorp matched · exiting cohort → <em>Active Founder</em> when public launch detected</div></span><span class="badge blue">ex-Stripe ledgering</span><span class="num" style="color:var(--signal)">FR 86</span><button class="btn">Open</button></div>
+    <div class="row tgt"><span><b>Yuki Tanaka</b> <span class="badge amber">Stealth Founder</span><div class="m">exited Adyen risk org · attended 2 salons · asked 3 reconciliation questions</div></span><span class="badge blue">ex-Adyen risk</span><span class="num" style="color:var(--signal)">FR 81</span><button class="btn">Open</button></div>
+    <div class="row tgt"><span><b>Sam Okafor</b> <span class="badge amber">Stealth Founder</span><div class="m">exited Marqeta · high thread-revival trace · zero public signal — <em>nobody else sees this person</em></div></span><span class="badge blue">ex-Marqeta issuing</span><span class="num" style="color:var(--signal)">FR 77</span><button class="btn">Open</button></div>
+    <div class="row tgt"><span><b>Elena Rostova</b> <span class="badge blue">Future Founder</span><div class="m">still at Stripe Treasury · salon regular · FR 74 — <em>nurture now, source in 12–18 mo</em></div></span><span class="badge blue">Stripe · employed</span><span class="num">FR 74</span><button class="btn">Open</button></div>
   </div>
   <div class="card" style="margin-top:14px">
     <div class="sec-h">Cohort math</div>
@@ -238,7 +238,7 @@ h1{font-family:var(--disp);font-size:24px;font-weight:600;letter-spacing:-.01em;
       <div class="stage"><h4>Graph population</h4><div class="n">4,218</div></div>
       <div class="stage"><h4>Recent incumbent exits</h4><div class="n">61</div><div class="cv">1.4%</div></div>
       <div class="stage"><h4>+ event engaged</h4><div class="n">19</div><div class="cv">31%</div></div>
-      <div class="stage hot"><h4>+ FR ≥ 70 · no incorp</h4><div class="n">4</div><div class="cv">the window</div></div>
+      <div class="stage hot"><h4>+ archetype filter</h4><div class="n">5</div><div class="cv">stealth + future</div></div>
       <div class="stage"><h4>RFS matched</h4><div class="n">3</div><div class="cv">RFS-01/02</div></div>
     </div>
   </div>

@@ -26,6 +26,9 @@ h1{font-family:var(--disp);font-size:30px;font-weight:600;letter-spacing:-.015em
 .badge.amber{color:var(--signal);border-color:var(--signal-dim)}
 .badge.sage{color:var(--up);border-color:#3c5c4c}
 .badge.clay{color:var(--down);border-color:#6a4038}
+.badge.arch-stealth{color:var(--signal);border-color:var(--signal-dim)}
+.badge.arch-future{color:#a8c4d8;border-color:#4a6278}
+.badge.arch-repeat{color:#d4b896;border-color:#7a6040}
 
 /* candidate switcher */
 .switcher{display:flex;gap:10px;margin-bottom:18px;flex-wrap:wrap}
@@ -80,9 +83,9 @@ footer b{color:var(--text-dim);font-weight:500}
   <p class="sub">Ten skills résumés can't hold, scored from interaction exhaust. The shape predicts what to do — invest, intervene, or pair.</p>
 
   <div class="switcher" role="tablist" aria-label="Candidates">
-    <button class="cand active" data-c="0" role="tab" aria-selected="true"><span class="av">PR</span><span><span class="nm">Priya Raghavan</span><br><span class="rl">ex-Stripe · stealth</span></span></button>
-    <button class="cand" data-c="1" role="tab" aria-selected="false"><span class="av">DK</span><span><span class="nm">Dana Kimura</span><br><span class="rl">ex-Hyland · exploring</span></span></button>
-    <button class="cand" data-c="2" role="tab" aria-selected="false"><span class="av">JW</span><span><span class="nm">Jordan Wells</span><br><span class="rl">2× operator · loud</span></span></button>
+    <button class="cand active" data-c="0" role="tab" aria-selected="true"><span class="av">PR</span><span><span class="nm">Priya Raghavan</span><br><span class="rl"><span class="badge arch-stealth">Stealth Founder</span></span></span></button>
+    <button class="cand" data-c="1" role="tab" aria-selected="false"><span class="av">DK</span><span><span class="nm">Dana Kimura</span><br><span class="rl"><span class="badge arch-stealth">Stealth Founder</span> · pair</span></span></button>
+    <button class="cand" data-c="2" role="tab" aria-selected="false"><span class="av">JW</span><span><span class="nm">Jordan Wells</span><br><span class="rl"><span class="badge arch-repeat">Repeat Founder</span> · loud</span></span></button>
   </div>
 
   <div class="layout">
@@ -126,7 +129,7 @@ const SKILLS=["01 underestimated","02 questions","03 sched gravity","04 document
 const MEDIAN=[55,60,58,52,50,54,57,50,56,58];
 
 const CANDS=[
- {name:"Priya Raghavan",score:86,verdict:"invest-grade shape",vcolor:"var(--up)",
+ {name:"Priya Raghavan",archetype:"Stealth Founder",score:86,verdict:"invest-grade shape",vcolor:"var(--up)",
   vals:[88,92,84,71,63,79,90,85,74,93],
   clusters:[["Information advantage",88],["Human gravity",79],["Execution durability",76],["Conviction integrity",90]],
   rec:{h:"Recommendation: lead the pre-seed, now",
@@ -137,7 +140,7 @@ const CANDS=[
    {n:"07",t:"Pushed back on a GP's marketplace thesis — warmth score unchanged after",m:"disagreement flagged in salon transcript; relationship edge stayed at 78",s:"transcript+graph"},
    {n:"03",t:"Three senior operators rescheduled to meet her, not the reverse",m:"inbound reschedule flow +3 / outbound 0 over 60 days",s:"gcal"}]},
 
- {name:"Dana Kimura",score:71,verdict:"pair-to-complete",vcolor:"var(--signal)",
+ {name:"Dana Kimura",archetype:"Stealth Founder",score:71,verdict:"pair-to-complete",vcolor:"var(--signal)",
   vals:[62,58,55,90,88,60,52,94,68,72],
   clusters:[["Information advantage",70],["Human gravity",61],["Execution durability",84],["Conviction integrity",52]],
   rec:{h:"Recommendation: don't fund solo — pair with a wedge-finder",
@@ -148,7 +151,7 @@ const CANDS=[
    {n:"05",t:"Renegotiated her team's Documentum contract, referenced twice at salons",m:"vendor-cost fluency flagged in 2 transcripts",s:"granola"},
    {n:"07",t:"Deferred to senior opinion in 4 of 4 tracked disagreements",m:"weak trace — the gap the pairing must cover",s:"transcript",dim:true}]},
 
- {name:"Jordan Wells",score:54,verdict:"charisma without traces",vcolor:"var(--down)",
+ {name:"Jordan Wells",archetype:"Repeat Founder",score:54,verdict:"charisma without traces",vcolor:"var(--down)",
   vals:[22,38,72,30,35,44,48,25,81,31],
   clusters:[["Information advantage",28],["Human gravity",66],["Execution durability",32],["Conviction integrity",48]],
   rec:{h:"Recommendation: hold — the résumé outruns the exhaust",
@@ -201,7 +204,7 @@ function render(c){
     dots.appendChild(d);
   });
   document.getElementById('score').innerHTML=c.score+'<small>/100</small>';
-  const v=document.getElementById('verdict');v.textContent=c.verdict;v.style.color=c.vcolor;
+  const v=document.getElementById('verdict');v.textContent=c.archetype+' · '+c.verdict;v.style.color=c.vcolor;
   document.getElementById('clusters').innerHTML=c.clusters.map(([n,s])=>
     `<div class="card cluster"><h4>${n}</h4><div class="cv">${s}</div><div class="track"><i style="width:${s}%"></i></div></div>`).join('');
   document.getElementById('rec').innerHTML=`<h3>${c.rec.h}</h3><p>${c.rec.p}</p>`;
