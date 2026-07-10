@@ -98,7 +98,7 @@
     <text x="430" y="558" text-anchor="middle" font-size="9" fill="#777">founder ↔ talent ↔ capital matching</text>
 
     <rect x="600" y="518" width="220" height="56" rx="8" fill="#eef2f7" stroke="#b8c4d0"/>
-    <text x="710" y="540" text-anchor="middle" font-weight="600">Fund OS Dashboard</text>
+    <text x="710" y="540" text-anchor="middle" font-weight="600">InFlight Dashboard</text>
     <text x="710" y="558" text-anchor="middle" font-size="9" fill="#777">flywheel metrics for partners &amp; LPs</text>
   </g>
 
